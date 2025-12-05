@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: Simple API
+  version: 1.0.0
+paths:
+  /api/hello/:
+    get:
+      summary: Get hello world message
+      tags:
+        - Hello
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time

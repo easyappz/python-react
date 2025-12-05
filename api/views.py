@@ -16,4 +16,5 @@ class HelloView(APIView):
     def get(self, request):
         data = {"message": "Hello!", "timestamp": timezone.now()}
         serializer = MessageSerializer(data)
+        serializer.is_valid(raise_exception=True)
         return Response(serializer.data)

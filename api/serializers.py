@@ -133,3 +133,13 @@ class DialogCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError('Member not found')
         
         return value
+
+
+class AdminMessageSerializer(serializers.ModelSerializer):
+    sender = MessageSenderSerializer(read_only=True)
+    dialog_id = serializers.IntegerField(source='dialog.id', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'dialog_id', 'sender', 'text', 'created_at']
+        read_only_fields = ['id', 'dialog_id', 'sender', 'created_at']

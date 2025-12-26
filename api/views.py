@@ -15,7 +15,8 @@ from .serializers import (
     DialogCreateSerializer,
     MessageSerializer,
     MessageCreateSerializer,
-    DialogParticipantSerializer
+    DialogParticipantSerializer,
+    AdminMessageSerializer
 )
 from .authentication import CookieAuthentication
 
@@ -309,5 +310,91 @@ class MessageCreateView(APIView):
         except Dialog.DoesNotExist:
             return Response(
                 {'error': 'Dialog not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class AdminMembersView(APIView):
+    """
+    Admin endpoint for managing members
+    """
+    authentication_classes = [CookieAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_admin:
+            return Response(
+                {'error': 'Access denied - admin only'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        members = Member.objects.all()
+        serializer = MemberSerializer(members, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        if not request.user.is_admin:
+            return Response(
+                {'error': 'Access denied - admin only'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        member_id = request.query_params.get('id')
+        if not member_id:
+            return Response(
+                {'error': 'Member ID is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            member = Member.objects.get(id=member_id)
+            member.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Member.DoesNotExist:
+            return Response(
+                {'error': 'Member not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class AdminMessagesView(APIView):
+    """
+    Admin endpoint for managing messages
+    """
+    authentication_classes = [CookieAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_admin:
+            return Response(
+                {'error': 'Access denied - admin only'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        messages = Message.objects.all().order_by('-created_at')
+        serializer = AdminMessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        if not request.user.is_admin:
+            return Response(
+                {'error': 'Access denied - admin only'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        message_id = request.query_params.get('id')
+        if not message_id:
+            return Response(
+                {'error': 'Message ID is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            message = Message.objects.get(id=message_id)
+            message.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Message.DoesNotExist:
+            return Response(
+                {'error': 'Message not found'},
                 status=status.HTTP_404_NOT_FOUND
             )

@@ -10,7 +10,9 @@ from .views import (
     DialogListView,
     DialogCreateView,
     DialogDetailView,
-    MessageCreateView
+    MessageCreateView,
+    AdminMembersView,
+    AdminMessagesView
 )
 
 urlpatterns = [
@@ -32,4 +34,8 @@ urlpatterns = [
     
     # Messages
     path('dialogs/<int:id>/messages/', MessageCreateView.as_view(), name='message-create'),
+    
+    # Admin
+    path('admin/members/', AdminMembersView.as_view(), name='admin-members'),
+    path('admin/messages/', AdminMessagesView.as_view(), name='admin-messages'),
 ]

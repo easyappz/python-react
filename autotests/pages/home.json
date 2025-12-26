@@ -1,6 +1,6 @@
 [
   {
-    "name": "Проверка главной страницы",
+    "name": "Проверка отображения главной страницы для неавторизованного пользователя",
     "steps": [
       {
         "action": "navigate",
@@ -11,6 +11,60 @@
       {
         "type": "url",
         "expectedUrl": "{domain}"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='home-title']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='home-guest-text']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='home-login-link']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='home-register-link']"
+      }
+    ]
+  },
+  {
+    "name": "Переход на страницу регистрации с главной",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='home-register-link']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/register"
+      }
+    ]
+  },
+  {
+    "name": "Переход на страницу входа с главной",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='home-login-link']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
       }
     ]
   }

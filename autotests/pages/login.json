@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Проверка отображения страницы входа",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-title']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-email-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-password-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-submit-button']"
+      }
+    ]
+  },
+  {
+    "name": "Валидация пустых полей при входе",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-error']"
+      },
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      }
+    ]
+  },
+  {
+    "name": "Успешная авторизация пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "logintest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Петр"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "Петров"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email-input']",
+        "value": "logintest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      }
+    ]
+  }
+]

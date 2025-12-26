@@ -1,0 +1,272 @@
+[
+  {
+    "name": "Проверка редиректа на страницу входа для неавторизованного пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      }
+    ]
+  },
+  {
+    "name": "Отображение профиля авторизованного пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "profiletest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Сергей"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "Сергеев"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email-input']",
+        "value": "profiletest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-title']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-email']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-firstname']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-lastname']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-edit-button']"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование профиля пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "editprofile@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Алексей"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "Алексеев"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email-input']",
+        "value": "editprofile@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='profile-edit-button']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='profile-firstname-input']",
+        "value": "Измененное Имя"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='profile-lastname-input']",
+        "value": "Измененная Фамилия"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='profile-save-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-success']"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='profile-firstname']",
+        "expectedText": "Измененное Имя"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='profile-lastname']",
+        "expectedText": "Измененная Фамилия"
+      }
+    ]
+  },
+  {
+    "name": "Выход из системы",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "logouttest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Дмитрий"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "Дмитриев"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email-input']",
+        "value": "logouttest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='header-logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='header-login-link']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='header-register-link']"
+      }
+    ]
+  }
+]

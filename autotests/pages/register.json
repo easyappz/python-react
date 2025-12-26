@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Проверка отображения страницы регистрации",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/register"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-title']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-email-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-password-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-firstname-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-lastname-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-submit-button']"
+      }
+    ]
+  },
+  {
+    "name": "Валидация пустых полей при регистрации",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='register-error']"
+      },
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/register"
+      }
+    ]
+  },
+  {
+    "name": "Успешная регистрация нового пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Иван"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "Иванов"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      }
+    ]
+  }
+]

@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
 import ProfileEdit from './components/ProfileEdit';
+import Search from './components/Search';
 
 const RedirectRoute = () => {
   const { user, loading } = useAuth();
@@ -76,7 +77,7 @@ function AppRoutes() {
         path="/search"
         element={
           <PrivateRoute>
-            <Profile />
+            <Search />
           </PrivateRoute>
         }
       />

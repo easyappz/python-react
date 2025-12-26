@@ -1,0 +1,160 @@
+[
+  {
+    "name": "Регистрация и переход на страницу поиска",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "searchtestuser@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "SearchTest"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "User"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/search"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/search"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='search-input']"
+      }
+    ]
+  },
+  {
+    "name": "Ввод текста в поле поиска",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "searchuser2@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "Test"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "Finder"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/search"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='search-input']",
+        "value": "Test"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='search-input']"
+      }
+    ]
+  },
+  {
+    "name": "Отображение результатов поиска",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "resultsuser@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "Results"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "Checker"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/search"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='user-card']"
+      }
+    ]
+  }
+]

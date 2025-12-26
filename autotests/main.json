@@ -15,6 +15,10 @@
     {
       "name": "Тестирование страницы профиля",
       "filepath": "profile.json"
+    },
+    {
+      "name": "Тестирование страницы поиска",
+      "filepath": "search.json"
     }
   ]
 }

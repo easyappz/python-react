@@ -5,9 +5,10 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import './App.css';
 
-import { Home } from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import Profile from './components/Profile';
+import ProfileEdit from './components/ProfileEdit';
 
 const RedirectRoute = () => {
   const { user, loading } = useAuth();
@@ -33,6 +34,7 @@ function AppRoutes() {
         '/login',
         '/register',
         '/profile',
+        '/profile/edit',
         '/profile/:id',
         '/search',
         '/dialogs',
@@ -50,7 +52,15 @@ function AppRoutes() {
         path="/profile"
         element={
           <PrivateRoute>
-            <Home />
+            <Profile />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile/edit"
+        element={
+          <PrivateRoute>
+            <ProfileEdit />
           </PrivateRoute>
         }
       />
@@ -58,7 +68,7 @@ function AppRoutes() {
         path="/profile/:id"
         element={
           <PrivateRoute>
-            <Home />
+            <Profile />
           </PrivateRoute>
         }
       />
@@ -66,7 +76,7 @@ function AppRoutes() {
         path="/search"
         element={
           <PrivateRoute>
-            <Home />
+            <Profile />
           </PrivateRoute>
         }
       />
@@ -74,7 +84,7 @@ function AppRoutes() {
         path="/dialogs"
         element={
           <PrivateRoute>
-            <Home />
+            <Profile />
           </PrivateRoute>
         }
       />
@@ -82,7 +92,7 @@ function AppRoutes() {
         path="/dialogs/:id"
         element={
           <PrivateRoute>
-            <Home />
+            <Profile />
           </PrivateRoute>
         }
       />

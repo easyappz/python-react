@@ -1,0 +1,52 @@
+.vk-sidebar {
+  width: 200px;
+  background-color: var(--vk-white);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 0 #d7d8db, 0 0 0 1px #e3e4e8;
+  padding: 6px 0;
+  align-self: flex-start;
+  position: sticky;
+  top: 70px;
+}
+
+.vk-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.vk-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--vk-text-primary);
+  text-align: left;
+  transition: background-color 0.15s;
+  width: 100%;
+}
+
+.vk-sidebar-item:hover {
+  background-color: #f0f2f5;
+}
+
+.vk-sidebar-item.active {
+  background-color: #e5ebf1;
+  color: var(--vk-primary);
+  font-weight: 500;
+}
+
+.vk-sidebar-icon {
+  font-size: 18px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vk-sidebar-label {
+  flex: 1;
+}

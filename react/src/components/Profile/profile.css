@@ -1,0 +1,81 @@
+.vk-profile {
+  max-width: 800px;
+}
+
+.vk-profile-loading,
+.vk-profile-error {
+  background-color: var(--vk-white);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 0 #d7d8db, 0 0 0 1px #e3e4e8;
+  padding: 40px;
+  text-align: center;
+  color: var(--vk-text-secondary);
+}
+
+.vk-profile-card {
+  background-color: var(--vk-white);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 0 #d7d8db, 0 0 0 1px #e3e4e8;
+  padding: 20px;
+}
+
+.vk-profile-header {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.vk-profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--vk-primary) 0%, var(--vk-primary-hover) 100%);
+  color: var(--vk-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.vk-profile-info {
+  flex: 1;
+  padding-top: 10px;
+}
+
+.vk-profile-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--vk-text-primary);
+  margin: 0 0 8px 0;
+}
+
+.vk-profile-status {
+  font-size: 13px;
+  color: var(--vk-text-secondary);
+}
+
+.vk-profile-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--vk-border);
+}
+
+.vk-profile-button {
+  padding: 10px 20px;
+  background-color: var(--vk-primary);
+  color: var(--vk-white);
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.vk-profile-button:hover {
+  background-color: var(--vk-primary-hover);
+}

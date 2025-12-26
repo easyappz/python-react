@@ -1,0 +1,62 @@
+.vk-profile-edit {
+  max-width: 600px;
+}
+
+.vk-profile-edit-card {
+  background-color: var(--vk-white);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 0 #d7d8db, 0 0 0 1px #e3e4e8;
+  padding: 20px;
+}
+
+.vk-profile-edit-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--vk-text-primary);
+  margin: 0 0 20px 0;
+}
+
+.vk-profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vk-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vk-form-label {
+  font-size: 13px;
+  color: var(--vk-text-secondary);
+  font-weight: 500;
+}
+
+.vk-profile-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.vk-button-secondary {
+  padding: 12px 20px;
+  background-color: var(--vk-white);
+  color: var(--vk-primary);
+  border: 1px solid var(--vk-border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.vk-button-secondary:hover {
+  background-color: #f0f2f5;
+}
+
+.vk-button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "name": "Просмотр своего профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='first-name-input']",
+        "value": "Иван"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='last-name-input']",
+        "value": "Иванов"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "profile_test@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-easytag='id5-src/components/Profile/index.jsx']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='edit-profile-button']"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='first-name-input']",
+        "value": "Петр"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='last-name-input']",
+        "value": "Петров"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "profile_edit_test@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='edit-profile-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='first-name-input']",
+        "value": "ПетрОбновленный"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='last-name-input']",
+        "value": "ПетровОбновленный"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='save-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      }
+    ]
+  }
+]

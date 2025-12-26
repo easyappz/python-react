@@ -5,21 +5,12 @@ export const getDialogs = async () => {
   return response.data;
 };
 
-export const createDialog = async (participantId) => {
-  const response = await instance.post('/api/dialogs/', {
-    participant_id: participantId
-  });
-  return response.data;
-};
-
 export const getDialog = async (id) => {
   const response = await instance.get(`/api/dialogs/${id}/`);
   return response.data;
 };
 
-export const sendMessage = async (dialogId, text) => {
-  const response = await instance.post(`/api/dialogs/${dialogId}/messages/`, {
-    text
-  });
+export const createDialog = async (participant_id) => {
+  const response = await instance.post('/api/dialogs/create/', { participant_id });
   return response.data;
 };

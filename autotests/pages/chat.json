@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Регистрация первого пользователя",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "chatuser1@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "Алексей"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "Смирнов"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      }
+    ]
+  },
+  {
+    "name": "Отправка сообщения в чате",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/dialogs/1"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='message-input']",
+        "value": "Привет! Это тестовое сообщение."
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='send-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='message-item']"
+      }
+    ]
+  },
+  {
+    "name": "Отображение интерфейса чата",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/dialogs/1"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-easytag='id10-src/components/Chat/index.jsx']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='message-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='send-button']"
+      }
+    ]
+  }
+]

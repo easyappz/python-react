@@ -10,6 +10,8 @@ import Register from './components/Register';
 import Profile from './components/Profile';
 import ProfileEdit from './components/ProfileEdit';
 import Search from './components/Search';
+import Dialogs from './components/Dialogs';
+import Chat from './components/Chat';
 
 const RedirectRoute = () => {
   const { user, loading } = useAuth();
@@ -85,7 +87,7 @@ function AppRoutes() {
         path="/dialogs"
         element={
           <PrivateRoute>
-            <Profile />
+            <Dialogs />
           </PrivateRoute>
         }
       />
@@ -93,7 +95,7 @@ function AppRoutes() {
         path="/dialogs/:id"
         element={
           <PrivateRoute>
-            <Profile />
+            <Chat />
           </PrivateRoute>
         }
       />

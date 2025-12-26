@@ -19,6 +19,14 @@
     {
       "name": "Тестирование страницы поиска",
       "filepath": "search.json"
+    },
+    {
+      "name": "Тестирование страницы диалогов",
+      "filepath": "dialogs.json"
+    },
+    {
+      "name": "Тестирование страницы чата",
+      "filepath": "chat.json"
     }
   ]
 }

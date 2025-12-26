@@ -1,0 +1,87 @@
+[
+  {
+    "name": "Регистрация и авторизация перед тестом диалогов",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "dialogtest@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "Иван"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "Петров"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      }
+    ]
+  },
+  {
+    "name": "Переход на страницу диалогов",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/dialogs"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/dialogs"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-easytag='id9-src/components/Dialogs/index.jsx']"
+      }
+    ]
+  },
+  {
+    "name": "Отображение пустого списка диалогов",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/dialogs"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".dialogs-empty"
+      }
+    ]
+  }
+]

@@ -1,0 +1,78 @@
+get:
+  summary: Get all members (admin)
+  description: Returns all members for admin management
+  tags:
+    - Admin
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: List of all members
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+    '403':
+      description: Access denied - admin only
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+
+delete:
+  summary: Delete a member (admin)
+  description: Deletes a member by ID
+  tags:
+    - Admin
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: query
+      description: Member ID to delete
+      required: true
+      schema:
+        type: integer
+  responses:
+    '204':
+      description: Member successfully deleted
+    '404':
+      description: Member not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '403':
+      description: Access denied - admin only
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

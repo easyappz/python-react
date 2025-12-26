@@ -1,0 +1,53 @@
+get:
+  summary: Get list of dialogs
+  description: Returns all dialogs for the current user
+  tags:
+    - Dialogs
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: List of dialogs
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                participant:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    email:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                last_message:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: integer
+                    text:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    sender_id:
+                      type: integer
+                created_at:
+                  type: string
+                  format: date-time
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

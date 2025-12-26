@@ -1,0 +1,78 @@
+get:
+  summary: Get dialog with messages
+  description: Returns a specific dialog with all its messages
+  tags:
+    - Dialogs
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Dialog ID
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Dialog with messages
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              participant:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+              messages:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    sender:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                    text:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+              created_at:
+                type: string
+                format: date-time
+    '403':
+      description: Access denied - not a participant of this dialog
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '404':
+      description: Dialog not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

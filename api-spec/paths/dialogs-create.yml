@@ -1,0 +1,79 @@
+post:
+  summary: Create a new dialog
+  description: Creates a new dialog with another user or returns existing one
+  tags:
+    - Dialogs
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - participant_id
+          properties:
+            participant_id:
+              type: integer
+              example: 2
+  responses:
+    '201':
+      description: Dialog created successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              participant:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+              created_at:
+                type: string
+                format: date-time
+    '200':
+      description: Dialog already exists
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              participant:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+              created_at:
+                type: string
+                format: date-time
+    '400':
+      description: Invalid participant or cannot create dialog with yourself
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

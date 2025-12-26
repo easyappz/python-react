@@ -1,0 +1,54 @@
+post:
+  summary: Login user
+  description: Authenticates user and returns user data with HttpOnly cookie
+  tags:
+    - Authentication
+  x-isSecure: false
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            password:
+              type: string
+              format: password
+              example: password123
+  responses:
+    '200':
+      description: Successfully authenticated
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+            example: sessionid=abc123; HttpOnly; Path=/
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+    '401':
+      description: Invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

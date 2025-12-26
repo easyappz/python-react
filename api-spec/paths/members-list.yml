@@ -1,0 +1,43 @@
+get:
+  summary: Get list of members
+  description: Returns a list of all members with optional search by name
+  tags:
+    - Members
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: search
+      in: query
+      description: Search by first name or last name
+      required: false
+      schema:
+        type: string
+        example: John
+  responses:
+    '200':
+      description: List of members
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

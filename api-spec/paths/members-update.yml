@@ -1,0 +1,65 @@
+patch:
+  summary: Update member profile
+  description: Updates the member's profile information (only own profile)
+  tags:
+    - Members
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Member ID
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            first_name:
+              type: string
+              example: John
+            last_name:
+              type: string
+              example: Doe
+  responses:
+    '200':
+      description: Profile successfully updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+    '403':
+      description: Cannot update other user's profile
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '404':
+      description: Member not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

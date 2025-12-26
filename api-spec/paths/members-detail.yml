@@ -1,0 +1,46 @@
+get:
+  summary: Get member profile
+  description: Returns detailed information about a specific member
+  tags:
+    - Members
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Member ID
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Member profile data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+    '404':
+      description: Member not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

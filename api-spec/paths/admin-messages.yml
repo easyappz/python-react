@@ -1,0 +1,85 @@
+get:
+  summary: Get all messages (admin)
+  description: Returns all messages for admin management
+  tags:
+    - Admin
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: List of all messages
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                dialog_id:
+                  type: integer
+                sender:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                text:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+    '403':
+      description: Access denied - admin only
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+
+delete:
+  summary: Delete a message (admin)
+  description: Deletes a message by ID
+  tags:
+    - Admin
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: query
+      description: Message ID to delete
+      required: true
+      schema:
+        type: integer
+  responses:
+    '204':
+      description: Message successfully deleted
+    '404':
+      description: Message not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '403':
+      description: Access denied - admin only
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

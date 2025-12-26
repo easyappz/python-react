@@ -1,0 +1,78 @@
+post:
+  summary: Send a message
+  description: Sends a new message in the dialog
+  tags:
+    - Messages
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Dialog ID
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - text
+          properties:
+            text:
+              type: string
+              minLength: 1
+              example: Hello, how are you?
+  responses:
+    '201':
+      description: Message sent successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              dialog_id:
+                type: integer
+              sender:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+              text:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+    '403':
+      description: Access denied - not a participant of this dialog
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '404':
+      description: Dialog not found
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '400':
+      description: Invalid message text
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

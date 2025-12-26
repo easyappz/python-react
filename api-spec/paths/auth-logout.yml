@@ -1,0 +1,25 @@
+post:
+  summary: Logout user
+  description: Logs out the current user and clears the session
+  tags:
+    - Authentication
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: Successfully logged out
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Successfully logged out
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yml#/components/schemas/Error'

@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  description: API for a small social network with registration, authentication, profiles, user search and dialogs
+  version: 1.0.0
+servers:
+  - url: /api
+    description: API server
+
+paths:
+  /auth/register:
+    $ref: './paths/auth-register.yml'
+  /auth/login:
+    $ref: './paths/auth-login.yml'
+  /auth/logout:
+    $ref: './paths/auth-logout.yml'
+  /auth/me:
+    $ref: './paths/auth-me.yml'
+  /members:
+    $ref: './paths/members-list.yml'
+  /members/{id}:
+    $ref: './paths/members-detail.yml'
+  /members/{id}/update:
+    $ref: './paths/members-update.yml'
+  /dialogs:
+    $ref: './paths/dialogs-list.yml'
+  /dialogs/create:
+    $ref: './paths/dialogs-create.yml'
+  /dialogs/{id}:
+    $ref: './paths/dialogs-detail.yml'
+  /dialogs/{id}/messages:
+    $ref: './paths/messages-create.yml'
+  /admin/members:
+    $ref: './paths/admin-members.yml'
+  /admin/messages:
+    $ref: './paths/admin-messages.yml'
+
+components:
+  schemas:
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    
+    Dialog:
+      type: object
+      properties:
+        id:
+          type: integer
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+        last_message:
+          $ref: '#/components/schemas/Message'
+        created_at:
+          type: string
+          format: date-time
+    
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        dialog_id:
+          type: integer
+        sender:
+          $ref: '#/components/schemas/Member'
+        text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

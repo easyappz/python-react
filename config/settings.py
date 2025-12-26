@@ -55,6 +55,15 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Session settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_SAVE_EVERY_REQUEST = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -74,6 +83,12 @@ INSTALLED_APPS = [
 # REST Framework configuration
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "api.authentication.CookieAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
 }
 
 # drf-spectacular configuration

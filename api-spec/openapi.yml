@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: Easyappz API
+  version: 1.0.0
+  description: API specification for this project.
+
+servers:
+  - url: /
+
+paths:
+  /api/hello/:
+    $ref: './paths/hello.yml'

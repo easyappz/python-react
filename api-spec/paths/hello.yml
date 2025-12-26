@@ -1,0 +1,26 @@
+get:
+  summary: Get a hello world message
+  description: Returns a greeting message and server timestamp.
+  isSecure: false
+  operationId: getHello
+  tags:
+    - Hello
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            required:
+              - message
+              - timestamp
+            properties:
+              message:
+                type: string
+                maxLength: 200
+                example: Hello!
+              timestamp:
+                type: string
+                format: date-time

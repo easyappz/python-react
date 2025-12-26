@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../api/auth';
-import { useAuth } from '../../context/AuthContext';
 
 export const Register = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +9,6 @@ export const Register = () => {
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,8 +25,7 @@ export const Register = () => {
     }
 
     try {
-      const userData = await register(email, password, firstName, lastName);
-      setUser(userData);
+      await register(email, password, firstName, lastName);
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.error || 'Ошибка регистрации');

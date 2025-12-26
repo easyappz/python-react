@@ -8,27 +8,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='first-name-input']",
+        "selector": "[data-testid='register-firstname-input']",
         "value": "Иван"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='last-name-input']",
+        "selector": "[data-testid='register-lastname-input']",
         "value": "Иванов"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='email-input']",
+        "selector": "[data-testid='register-email-input']",
         "value": "profile_test@test.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-input']",
+        "selector": "[data-testid='register-password-input']",
         "value": "password123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-button']"
+        "selector": "[data-testid='register-submit-button']"
       },
       {
         "action": "waitForRequests",
@@ -63,27 +63,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='first-name-input']",
+        "selector": "[data-testid='register-firstname-input']",
         "value": "Петр"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='last-name-input']",
+        "selector": "[data-testid='register-lastname-input']",
         "value": "Петров"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='email-input']",
+        "selector": "[data-testid='register-email-input']",
         "value": "profile_edit_test@test.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-input']",
+        "selector": "[data-testid='register-password-input']",
         "value": "password123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-button']"
+        "selector": "[data-testid='register-submit-button']"
       },
       {
         "action": "waitForRequests",

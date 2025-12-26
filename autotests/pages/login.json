@@ -1,0 +1,148 @@
+[
+  {
+    "name": "Проверка отображения формы входа",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-email-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-password-input']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-register-link']"
+      }
+    ]
+  },
+  {
+    "name": "Проверка валидации пустых полей",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='login-error-message']"
+      }
+    ]
+  },
+  {
+    "name": "Проверка перехода на страницу регистрации",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-register-link']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/register"
+      }
+    ]
+  },
+  {
+    "name": "Тест успешного входа после регистрации",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-firstname-input']",
+        "value": "Test"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-lastname-input']",
+        "value": "User"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email-input']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email-input']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      }
+    ]
+  }
+]

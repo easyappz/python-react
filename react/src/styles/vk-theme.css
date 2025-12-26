@@ -1,0 +1,134 @@
+/* VK Theme Colors */
+:root {
+  --vk-primary: #4a76a8;
+  --vk-primary-hover: #5181b8;
+  --vk-background: #e7e8ec;
+  --vk-white: #ffffff;
+  --vk-text-primary: #000000;
+  --vk-text-secondary: #656565;
+  --vk-border: #d3d9de;
+  --vk-error: #e64646;
+}
+
+.vk-page {
+  min-height: 100vh;
+  background-color: var(--vk-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.vk-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.vk-logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.vk-logo-text {
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--vk-primary);
+  text-decoration: none;
+}
+
+.vk-card {
+  background: var(--vk-white);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 0 #d7d8db, 0 0 0 1px #e3e4e8;
+  padding: 30px 25px;
+}
+
+.vk-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--vk-text-primary);
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.vk-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vk-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--vk-border);
+  border-radius: 4px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.vk-input:focus {
+  border-color: var(--vk-primary);
+}
+
+.vk-input.error {
+  border-color: var(--vk-error);
+}
+
+.vk-button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--vk-primary);
+  color: var(--vk-white);
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+}
+
+.vk-button:hover {
+  background-color: var(--vk-primary-hover);
+}
+
+.vk-button:disabled {
+  background-color: #a8b8c7;
+  cursor: not-allowed;
+}
+
+.vk-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--vk-text-secondary);
+}
+
+.vk-link a {
+  color: var(--vk-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.vk-link a:hover {
+  text-decoration: underline;
+}
+
+.vk-error-message {
+  color: var(--vk-error);
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.vk-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.vk-form-row .vk-input {
+  flex: 1;
+}

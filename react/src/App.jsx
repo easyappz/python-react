@@ -6,6 +6,8 @@ import { PrivateRoute } from './components/PrivateRoute';
 import './App.css';
 
 import { Home } from './components/Home';
+import Login from './components/Login';
+import Register from './components/Register';
 
 const RedirectRoute = () => {
   const { user, loading } = useAuth();
@@ -42,8 +44,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<RedirectRoute />} />
-      <Route path="/login" element={<Home />} />
-      <Route path="/register" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route
         path="/profile"
         element={

@@ -1,0 +1,134 @@
+[
+  {
+    "name": "Интеграционный тест: полный цикл работы с приложением",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "TestPassword123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-first-name']",
+        "value": "Иван"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-last-name']",
+        "value": "Иванов"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "TestPassword123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/search"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='search-input']",
+        "value": "Иван"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='search-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='user-card-message-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='chat-input']",
+        "value": "Привет! Это тестовое сообщение."
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='chat-send']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='message-item']"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='message-item']",
+        "expectedText": "Привет! Это тестовое сообщение."
+      }
+    ]
+  }
+]

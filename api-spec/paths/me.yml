@@ -1,0 +1,34 @@
+get:
+  summary: Get current user data
+  description: Returns the data of the currently authenticated user
+  operationId: getCurrentUser
+  x-isSecure: true
+  tags:
+    - Authentication
+  responses:
+    '200':
+      description: Current user data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+                format: email
+              first_name:
+                type: string
+              last_name:
+                type: string
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Authentication required

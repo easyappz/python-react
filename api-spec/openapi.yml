@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: Authentication & Profile API
+  version: 1.0.0
+  description: API for user authentication and profile management
+
+servers:
+  - url: /api
+    description: API server
+
+paths:
+  /auth/register/:
+    $ref: './paths/register.yml'
+  /auth/login/:
+    $ref: './paths/login.yml'
+  /auth/logout/:
+    $ref: './paths/logout.yml'
+  /auth/me/:
+    $ref: './paths/me.yml'
+  /profile/:
+    $ref: './paths/profile.yml'
+
+components:
+  schemas:
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        detail:
+          type: string

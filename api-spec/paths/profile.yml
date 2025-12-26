@@ -1,0 +1,60 @@
+put:
+  summary: Update user profile
+  description: Updates the first name and last name of the current user
+  operationId: updateProfile
+  x-isSecure: true
+  tags:
+    - Profile
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: User first name
+            last_name:
+              type: string
+              maxLength: 150
+              description: User last name
+  responses:
+    '200':
+      description: Profile successfully updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+                format: email
+              first_name:
+                type: string
+              last_name:
+                type: string
+    '400':
+      description: Bad request - validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              detail:
+                type: object
+    '401':
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Authentication required

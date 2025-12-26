@@ -1,16 +1,70 @@
 [
   {
-    "name": "Проверка главной страницы",
+    "name": "Главная страница открывается и показывает Hero",
     "steps": [
       {
         "action": "navigate",
         "url": "{domain}"
+      },
+      {
+        "action": "wait",
+        "delay": 600
       }
     ],
     "assertions": [
       {
-        "type": "url",
-        "expectedUrl": "{domain}"
+        "type": "visibility",
+        "selector": "[data-testid=\"home-hero\"]"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid=\"hero-title\"]"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid=\"cta-primary\"]"
+      }
+    ]
+  },
+  {
+    "name": "Навигация ведет к секции возможностей (якоря)",
+    "steps": [
+      {
+        "action": "click",
+        "selector": "[data-testid=\"nav-features\"]"
+      },
+      {
+        "action": "wait",
+        "delay": 700
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid=\"features\"]"
+      }
+    ]
+  },
+  {
+    "name": "Футер и контакты присутствуют",
+    "steps": [
+      {
+        "action": "click",
+        "selector": "[data-testid=\"cta-secondary\"]"
+      },
+      {
+        "action": "wait",
+        "delay": 800
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid=\"footer\"]"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid=\"footer-contacts\"]"
       }
     ]
   }

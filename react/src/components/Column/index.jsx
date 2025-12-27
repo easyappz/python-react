@@ -3,7 +3,7 @@ import { Droppable } from '@hello-pangea/dnd';
 import { Card } from '../Card';
 import { AddCard } from '../AddCard';
 import { CardModal } from '../CardModal';
-import { getCards } from '../../api/cards';
+import { getCards, createCard } from '../../api/cards';
 import { updateColumn, deleteColumn } from '../../api/columns';
 import toast from 'react-hot-toast';
 import './styles.css';
@@ -30,6 +30,16 @@ export const Column = ({ column, onRefresh }) => {
       setCards(data.sort((a, b) => a.position - b.position));
     } catch (error) {
       console.error('Error loading cards:', error);
+    }
+  };
+
+  const handleAddCard = async (cardData) => {
+    try {
+      await createCard(cardData);
+      await loadCards();
+    } catch (error) {
+      console.error('Error creating card:', error);
+      throw error;
     }
   };
 
@@ -132,7 +142,7 @@ export const Column = ({ column, onRefresh }) => {
           )}
         </Droppable>
 
-        <AddCard columnId={column.id} onAdd={loadCards} />
+        <AddCard columnId={column.id} onAdd={handleAddCard} />
       </div>
 
       {selectedCard && (

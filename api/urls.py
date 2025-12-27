@@ -3,7 +3,12 @@ from .views import (
     HelloView, RegisterView, LoginView, LogoutView, MeView,
     BoardListCreateView, BoardDetailView, BoardInviteView,
     ColumnListCreateView, ColumnDetailView, ColumnReorderView,
-    CardListCreateView, CardDetailView, CardMoveView, CardSearchView
+    CardListCreateView, CardDetailView, CardMoveView, CardSearchView,
+    ChecklistListCreateView, ChecklistDetailView,
+    ChecklistItemListCreateView,
+    CommentListCreateView, CommentDetailView,
+    LabelListCreateView, LabelDetailView,
+    AttachmentListCreateView, AttachmentDetailView
 )
 
 urlpatterns = [
@@ -28,4 +33,23 @@ urlpatterns = [
     path("cards/<int:id>/", CardDetailView.as_view(), name="cards-detail"),
     path("cards/<int:id>/move/", CardMoveView.as_view(), name="cards-move"),
     path("cards/search/", CardSearchView.as_view(), name="cards-search"),
+    
+    # Checklist endpoints
+    path("checklists/", ChecklistListCreateView.as_view(), name="checklists-list"),
+    path("checklists/<int:id>/", ChecklistDetailView.as_view(), name="checklists-detail"),
+    
+    # Checklist item endpoints
+    path("checklist-items/", ChecklistItemListCreateView.as_view(), name="checklist-items"),
+    
+    # Comment endpoints
+    path("comments/", CommentListCreateView.as_view(), name="comments-list"),
+    path("comments/<int:id>/", CommentDetailView.as_view(), name="comments-detail"),
+    
+    # Label endpoints
+    path("labels/", LabelListCreateView.as_view(), name="labels-list"),
+    path("labels/<int:id>/", LabelDetailView.as_view(), name="labels-detail"),
+    
+    # Attachment endpoints
+    path("attachments/", AttachmentListCreateView.as_view(), name="attachments-list"),
+    path("attachments/<int:id>/", AttachmentDetailView.as_view(), name="attachments-detail"),
 ]

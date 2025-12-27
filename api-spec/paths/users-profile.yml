@@ -1,0 +1,113 @@
+get:
+  summary: Get user profile
+  description: Retrieve current user profile information
+  operationId: getUserProfile
+  tags:
+    - Users
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: User profile information
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              username:
+                type: string
+              avatar:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+    '401':
+      description: Unauthorized - user not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                example: "Authentication required"
+
+patch:
+  summary: Update user profile
+  description: Update current user profile (username and/or avatar)
+  operationId: updateUserProfile
+  tags:
+    - Users
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              minLength: 3
+              maxLength: 150
+              description: New username
+            avatar:
+              type: string
+              nullable: true
+              description: Avatar URL or base64 encoded image
+  responses:
+    '200':
+      description: Profile successfully updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              username:
+                type: string
+              avatar:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+    '400':
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+          examples:
+            usernameExists:
+              value:
+                errors:
+                  username: ["User with this username already exists"]
+    '401':
+      description: Unauthorized - user not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                example: "Authentication required"

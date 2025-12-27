@@ -1,0 +1,82 @@
+post:
+  summary: Register a new user
+  description: Create a new user account with email, username and password
+  operationId: registerUser
+  tags:
+    - Authentication
+  x-isSecure: false
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              description: User email address
+            username:
+              type: string
+              minLength: 3
+              maxLength: 150
+              description: Unique username
+            password:
+              type: string
+              minLength: 8
+              description: User password
+            password_confirm:
+              type: string
+              minLength: 8
+              description: Password confirmation
+          required:
+            - email
+            - username
+            - password
+            - password_confirm
+  responses:
+    '201':
+      description: User successfully registered
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              username:
+                type: string
+              avatar:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+    '400':
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+          examples:
+            passwordMismatch:
+              value:
+                errors:
+                  password_confirm: ["Passwords do not match"]
+            emailExists:
+              value:
+                errors:
+                  email: ["User with this email already exists"]
+            usernameExists:
+              value:
+                errors:
+                  username: ["User with this username already exists"]

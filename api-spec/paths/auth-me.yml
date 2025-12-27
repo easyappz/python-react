@@ -1,0 +1,39 @@
+get:
+  summary: Get current authenticated user
+  description: Retrieve information about the currently authenticated user
+  operationId: getCurrentUser
+  tags:
+    - Authentication
+  x-isSecure: true
+  security:
+    - cookieAuth: []
+  responses:
+    '200':
+      description: Current user information
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              username:
+                type: string
+              avatar:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+    '401':
+      description: Unauthorized - user not authenticated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                example: "Authentication required"

@@ -1,0 +1,84 @@
+.add-card-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #5e6c84;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.add-card-btn:hover {
+  background: rgba(9, 30, 66, 0.08);
+}
+
+.add-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-card-input,
+.add-card-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #dfe1e6;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #172b4d;
+  transition: border-color 0.2s ease;
+}
+
+.add-card-input:focus,
+.add-card-textarea:focus {
+  outline: none;
+  border-color: #0079bf;
+}
+
+.add-card-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.add-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.add-card-submit,
+.add-card-cancel {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-card-submit {
+  background: #0079bf;
+  color: #fff;
+}
+
+.add-card-submit:hover:not(:disabled) {
+  background: #026aa7;
+}
+
+.add-card-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-card-cancel {
+  background: transparent;
+  color: #5e6c84;
+}
+
+.add-card-cancel:hover:not(:disabled) {
+  background: rgba(9, 30, 66, 0.08);
+}

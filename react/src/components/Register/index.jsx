@@ -4,225 +4,203 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { registerUser } from '../../api/auth';
 import toast from 'react-hot-toast';
+import { Header } from '../Header';
+import './styles.css';
 
 export const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const { t } = useLanguage();
+  const { login, isAuthenticated } = useAuth();
+  const { language, t } = useLanguage();
   const [formData, setFormData] = useState({
     email: '',
     username: '',
     password: '',
     password_confirm: '',
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = language === 'ru' ? 'Email обязателен' : 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = language === 'ru' ? 'Некорректный email' : 'Invalid email';
+    }
+
+    if (!formData.username) {
+      newErrors.username = language === 'ru' ? 'Имя пользователя обязательно' : 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = language === 'ru' ? 'Минимум 3 символа' : 'Minimum 3 characters';
+    }
+
+    if (!formData.password) {
+      newErrors.password = language === 'ru' ? 'Пароль обязателен' : 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = language === 'ru' ? 'Минимум 8 символов' : 'Minimum 8 characters';
+    }
+
+    if (!formData.password_confirm) {
+      newErrors.password_confirm = language === 'ru' ? 'Подтвердите пароль' : 'Confirm password';
+    } else if (formData.password !== formData.password_confirm) {
+      newErrors.password_confirm = language === 'ru' ? 'Пароли не совпадают' : 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    if (formData.password !== formData.password_confirm) {
-      toast.error('Пароли не совпадают');
-      setLoading(false);
+    if (!validateForm()) {
       return;
     }
+
+    setLoading(true);
 
     try {
       const userData = await registerUser(formData);
       login(userData);
-      toast.success('Регистрация успешна!');
+      toast.success(language === 'ru' ? 'Регистрация успешна' : 'Registration successful');
       navigate('/');
     } catch (error) {
-      const errors = error.response?.data?.errors;
-      if (errors) {
-        Object.values(errors).forEach((errorArray) => {
-          errorArray.forEach((msg) => toast.error(msg));
+      if (error.response?.data?.errors) {
+        const serverErrors = {};
+        Object.keys(error.response.data.errors).forEach((key) => {
+          serverErrors[key] = error.response.data.errors[key][0];
         });
+        setErrors(serverErrors);
       } else {
-        toast.error('Ошибка регистрации');
+        toast.error(language === 'ru' ? 'Ошибка регистрации' : 'Registration error');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
-    <div data-easytag="id1-react/src/components/Register/index.jsx" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f5f5f5',
-      padding: '20px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '400px',
-        backgroundColor: '#fff',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      }}>
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: '600',
-          color: '#333',
-          marginBottom: '30px',
-          textAlign: 'center',
-        }}>
-          {t('register')}
-        </h1>
+    <div className="register-page" data-easytag="id1-react/src/components/Register/index.jsx">
+      <Header />
+      <div className="register-container">
+        <div className="register-box">
+          <h1 className="register-title" data-testid="register-title">{t('register')}</h1>
+          <form onSubmit={handleSubmit} className="register-form" data-testid="register-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                {t('email')}
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`form-input ${errors.email ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Введите email' : 'Enter email'}
+                data-testid="register-email"
+              />
+              {errors.email && (
+                <span className="error-message" data-testid="error-email">{errors.email}</span>
+              )}
+            </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('email')}
-            </label>
-            <input
-              type="email"
-              name="email"
-              data-testid="register-email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
+            <div className="form-group">
+              <label htmlFor="username" className="form-label">
+                {t('username')}
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className={`form-input ${errors.username ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Введите имя пользователя' : 'Enter username'}
+                data-testid="register-username"
+              />
+              {errors.username && (
+                <span className="error-message" data-testid="error-username">{errors.username}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                {t('password')}
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`form-input ${errors.password ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Введите пароль' : 'Enter password'}
+                data-testid="register-password"
+              />
+              {errors.password && (
+                <span className="error-message" data-testid="error-password">{errors.password}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password_confirm" className="form-label">
+                {t('passwordConfirm')}
+              </label>
+              <input
+                type="password"
+                id="password_confirm"
+                name="password_confirm"
+                value={formData.password_confirm}
+                onChange={handleChange}
+                className={`form-input ${errors.password_confirm ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Подтвердите пароль' : 'Confirm password'}
+                data-testid="register-password-confirm"
+              />
+              {errors.password_confirm && (
+                <span className="error-message" data-testid="error-password-confirm">{errors.password_confirm}</span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={loading}
+              data-testid="register-submit"
+            >
+              {loading ? (language === 'ru' ? 'Регистрация...' : 'Registering...') : t('register')}
+            </button>
+          </form>
+
+          <div className="register-footer">
+            <p className="footer-text">
+              {language === 'ru' ? 'Уже есть аккаунт?' : 'Already have an account?'}{' '}
+              <Link to="/login" className="footer-link" data-testid="login-link">
+                {t('login')}
+              </Link>
+            </p>
           </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('username')}
-            </label>
-            <input
-              type="text"
-              name="username"
-              data-testid="register-username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              minLength={3}
-              maxLength={150}
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('password')}
-            </label>
-            <input
-              type="password"
-              name="password"
-              data-testid="register-password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={8}
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '30px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('passwordConfirm')}
-            </label>
-            <input
-              type="password"
-              name="password_confirm"
-              data-testid="register-password-confirm"
-              value={formData.password_confirm}
-              onChange={handleChange}
-              required
-              minLength={8}
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            data-testid="register-submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#fff',
-              backgroundColor: loading ? '#ccc' : '#0079bf',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {loading ? 'Загрузка...' : t('register')}
-          </button>
-        </form>
-
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          fontSize: '14px',
-          color: '#666',
-        }}>
-          Уже есть аккаунт?{' '}
-          <Link to="/login" style={{ color: '#0079bf', textDecoration: 'none' }}>
-            {t('login')}
-          </Link>
         </div>
       </div>
     </div>

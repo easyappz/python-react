@@ -1,0 +1,152 @@
+.header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.header-logo {
+  text-decoration: none;
+  color: #172b4d;
+  font-weight: 600;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
+}
+
+.logo-text {
+  color: #172b4d;
+}
+
+.header-nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex: 1;
+  margin-left: 32px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #5e6c84;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language-toggle {
+  background-color: transparent;
+  border: 1px solid #dfe1e6;
+  color: #5e6c84;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.language-toggle:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+  border-color: #c1c7d0;
+}
+
+.logout-button {
+  background-color: #f4f5f7;
+  border: none;
+  color: #5e6c84;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #e4e6ea;
+  color: #172b4d;
+}
+
+.auth-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.auth-link {
+  text-decoration: none;
+  color: #5e6c84;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.auth-link:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+}
+
+.auth-link.register {
+  background-color: #0079bf;
+  color: #ffffff;
+}
+
+.auth-link.register:hover {
+  background-color: #026aa7;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0 16px;
+  }
+
+  .header-nav {
+    margin-left: 16px;
+    gap: 8px;
+  }
+
+  .nav-link {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+  }
+}

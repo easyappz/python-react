@@ -4,153 +4,155 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { loginUser } from '../../api/auth';
 import toast from 'react-hot-toast';
+import { Header } from '../Header';
+import './styles.css';
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const { t } = useLanguage();
+  const { login, isAuthenticated } = useAuth();
+  const { language, t } = useLanguage();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = language === 'ru' ? 'Email обязателен' : 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = language === 'ru' ? 'Некорректный email' : 'Invalid email';
+    }
+
+    if (!formData.password) {
+      newErrors.password = language === 'ru' ? 'Пароль обязателен' : 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const userData = await loginUser(formData);
+      const userData = await loginUser({
+        email: formData.email,
+        password: formData.password,
+      });
       login(userData);
-      toast.success('Успешный вход!');
+      toast.success(language === 'ru' ? 'Вход выполнен успешно' : 'Login successful');
       navigate('/');
     } catch (error) {
-      const message = error.response?.data?.detail || 'Ошибка входа';
-      toast.error(message);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error(language === 'ru' ? 'Ошибка входа' : 'Login error');
+      }
+      setErrors({ general: error.response?.data?.detail || 'Login failed' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
-    <div data-easytag="id1-react/src/components/Login/index.jsx" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f5f5f5',
-      padding: '20px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '400px',
-        backgroundColor: '#fff',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      }}>
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: '600',
-          color: '#333',
-          marginBottom: '30px',
-          textAlign: 'center',
-        }}>
-          {t('login')}
-        </h1>
+    <div className="login-page" data-easytag="id1-react/src/components/Login/index.jsx">
+      <Header />
+      <div className="login-container">
+        <div className="login-box">
+          <h1 className="login-title" data-testid="login-title">{t('login')}</h1>
+          <form onSubmit={handleSubmit} className="login-form" data-testid="login-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                {t('email')}
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`form-input ${errors.email ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Введите email' : 'Enter email'}
+                data-testid="login-email"
+              />
+              {errors.email && (
+                <span className="error-message" data-testid="error-email">{errors.email}</span>
+              )}
+            </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('email')}
-            </label>
-            <input
-              type="email"
-              name="email"
-              data-testid="login-email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                {t('password')}
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`form-input ${errors.password ? 'error' : ''}`}
+                placeholder={language === 'ru' ? 'Введите пароль' : 'Enter password'}
+                data-testid="login-password"
+              />
+              {errors.password && (
+                <span className="error-message" data-testid="error-password">{errors.password}</span>
+              )}
+            </div>
+
+            {errors.general && (
+              <div className="error-message general" data-testid="error-general">
+                {errors.general}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={loading}
+              data-testid="login-submit"
+            >
+              {loading ? (language === 'ru' ? 'Вход...' : 'Logging in...') : t('login')}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p className="footer-text">
+              {language === 'ru' ? 'Нет аккаунта?' : "Don't have an account?"}{' '}
+              <Link to="/register" className="footer-link" data-testid="register-link">
+                {t('register')}
+              </Link>
+            </p>
           </div>
-
-          <div style={{ marginBottom: '30px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              {t('password')}
-            </label>
-            <input
-              type="password"
-              name="password"
-              data-testid="login-password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            data-testid="login-submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#fff',
-              backgroundColor: loading ? '#ccc' : '#0079bf',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {loading ? 'Загрузка...' : t('login')}
-          </button>
-        </form>
-
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          fontSize: '14px',
-          color: '#666',
-        }}>
-          Нет аккаунта?{' '}
-          <Link to="/register" style={{ color: '#0079bf', textDecoration: 'none' }}>
-            {t('register')}
-          </Link>
         </div>
       </div>
     </div>

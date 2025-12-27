@@ -1,16 +1,20 @@
 {
   "pages": [
     {
+      "name": "Тестирование стартовой страницы",
+      "filepath": "home.json"
+    },
+    {
       "name": "Тестирование авторизации",
       "filepath": "auth.json"
     },
     {
-      "name": "Тестирование главной страницы",
-      "filepath": "home.json"
-    },
-    {
       "name": "Тестирование дашборда",
       "filepath": "dashboard.json"
+    },
+    {
+      "name": "Тестирование доски",
+      "filepath": "board.json"
     }
   ]
 }

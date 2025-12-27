@@ -1,0 +1,155 @@
+[
+  {
+    "name": "Добавление колонки на доску",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-username']",
+        "value": "testuser_board"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-email']",
+        "value": "testboard@test.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
+        "value": "testpass123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password2']",
+        "value": "testpass123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='create-board-btn']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='board-title-input']",
+        "value": "Тестовая доска"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='board-submit-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='board-card']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-column-trigger']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='column-title-input']",
+        "value": "Новая колонка"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='column-submit-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='column-title']"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='column-title']",
+        "expectedText": "Новая колонка"
+      }
+    ]
+  },
+  {
+    "name": "Добавление карточки в колонку",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-username']",
+        "value": "testuser_board"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "testpass123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='board-card']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-card-trigger']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='card-title-input']",
+        "value": "Тестовая карточка"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='card-description-input']",
+        "value": "Описание тестовой карточки"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='card-submit-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".card-title"
+      }
+    ]
+  }
+]

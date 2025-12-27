@@ -9,7 +9,7 @@ import { Dashboard } from './components/Dashboard';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Profile } from './components/Profile';
-import { Board } from './components/Board';
+import { BoardPage } from './components/BoardPage';
 import { NotFound } from './components/NotFound';
 import './App.css';
 
@@ -35,7 +35,7 @@ function App() {
             } />
             <Route path="/board/:id" element={
               <PrivateRoute>
-                <Board />
+                <BoardPage />
               </PrivateRoute>
             } />
             <Route path="/profile" element={

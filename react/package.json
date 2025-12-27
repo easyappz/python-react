@@ -9,7 +9,9 @@
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.0",
     "react-scripts": "5.0.1",
-    "sourcemapped-stacktrace": "^1.1.11"
+    "sourcemapped-stacktrace": "^1.1.11",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-hot-toast": "^2.4.1"
   },
   "scripts": {
     "start": "react-scripts start",

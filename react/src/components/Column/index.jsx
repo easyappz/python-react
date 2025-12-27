@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 import { Card } from '../Card';
 import { AddCard } from '../AddCard';
 import { CardModal } from '../CardModal';

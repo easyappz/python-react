@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { Column } from '../Column';
 import { AddColumn } from '../AddColumn';
+import { InviteModal } from '../InviteModal';
 import { getBoard } from '../../api/boards';
 import { getColumns, createColumn } from '../../api/columns';
 import { moveCard } from '../../api/cards';
@@ -16,6 +17,7 @@ export const BoardPage = () => {
   const [columns, setColumns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
     loadBoardData();
@@ -84,7 +86,11 @@ export const BoardPage = () => {
   };
 
   const handleInvite = () => {
-    toast('Приглашение участников будет доступно позже');
+    setIsInviteModalOpen(true);
+  };
+
+  const handleInviteSuccess = () => {
+    loadBoardData();
   };
 
   if (isLoading) {
@@ -148,6 +154,13 @@ export const BoardPage = () => {
           <AddColumn onAdd={handleAddColumn} />
         </div>
       </DragDropContext>
+
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        board={board}
+        onInviteSuccess={handleInviteSuccess}
+      />
     </div>
   );
 };

@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     HelloView, RegisterView, LoginView, LogoutView, MeView,
     BoardListCreateView, BoardDetailView, BoardInviteView,
-    ColumnListCreateView, ColumnDetailView, ColumnReorderView
+    ColumnListCreateView, ColumnDetailView, ColumnReorderView,
+    CardListCreateView, CardDetailView, CardMoveView, CardSearchView
 )
 
 urlpatterns = [
@@ -21,4 +22,10 @@ urlpatterns = [
     path("columns/", ColumnListCreateView.as_view(), name="columns-list"),
     path("columns/<int:id>/", ColumnDetailView.as_view(), name="columns-detail"),
     path("columns/reorder/", ColumnReorderView.as_view(), name="columns-reorder"),
+    
+    # Card endpoints
+    path("cards/", CardListCreateView.as_view(), name="cards-list"),
+    path("cards/<int:id>/", CardDetailView.as_view(), name="cards-detail"),
+    path("cards/<int:id>/move/", CardMoveView.as_view(), name="cards-move"),
+    path("cards/search/", CardSearchView.as_view(), name="cards-search"),
 ]

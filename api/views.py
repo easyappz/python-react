@@ -3,13 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from django.db.models import Q
+from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from .serializers import (
     MessageSerializer, RegisterSerializer, LoginSerializer, MemberSerializer,
     BoardSerializer, BoardCreateSerializer, BoardInviteSerializer,
-    ColumnSerializer, ColumnCreateSerializer, ColumnReorderSerializer
+    ColumnSerializer, ColumnCreateSerializer, ColumnReorderSerializer,
+    CardSerializer, CardCreateSerializer, CardMoveSerializer
 )
-from .models import Member, Board, BoardMember, Column
+from .models import Member, Board, BoardMember, Column, Card
 
 
 class HelloView(APIView):
@@ -620,3 +622,397 @@ class ColumnReorderView(APIView):
                 status=status.HTTP_200_OK
             )
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CardListCreateView(APIView):
+    """
+    API endpoint for listing and creating cards
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: CardSerializer(many=True)},
+        description="Retrieve all cards for a specific column"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        column_id = request.query_params.get('column_id')
+        if not column_id:
+            return Response(
+                {'detail': 'column_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            column = Column.objects.select_related('board').get(id=column_id)
+        except Column.DoesNotExist:
+            return Response(
+                {'detail': 'Column not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        cards = Card.objects.filter(column=column).prefetch_related('checklists', 'comments', 'card_labels__label')
+        serializer = CardSerializer(cards, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=CardCreateSerializer,
+        responses={201: CardSerializer},
+        description="Create a new card in a column"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = CardCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            column = serializer.validated_data['column']
+            board = column.board
+            
+            if not self._has_board_access(board, member):
+                return Response(
+                    {'detail': 'Access forbidden'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            card = serializer.save()
+            response_serializer = CardSerializer(card)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CardDetailView(APIView):
+    """
+    API endpoint for retrieving, updating, and deleting a specific card
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: CardSerializer},
+        description="Retrieve detailed information about a specific card"
+    )
+    def get(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').prefetch_related(
+                'checklists__items', 'comments', 'card_labels__label'
+            ).get(id=id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CardSerializer(card)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=CardSerializer,
+        responses={200: CardSerializer},
+        description="Update card information"
+    )
+    def patch(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CardSerializer(card, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_serializer = CardSerializer(card)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete card"
+    )
+    def delete(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        card.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CardMoveView(APIView):
+    """
+    API endpoint for moving cards (Drag & Drop)
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        request=CardMoveSerializer,
+        responses={200: CardSerializer},
+        description="Move card to another column or change position"
+    )
+    def post(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CardMoveSerializer(data=request.data)
+        if serializer.is_valid():
+            target_column_id = serializer.validated_data['column']
+            new_position = serializer.validated_data['position']
+
+            try:
+                target_column = Column.objects.select_related('board').get(id=target_column_id)
+            except Column.DoesNotExist:
+                return Response(
+                    {'detail': 'Target column not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Check if target column is in the same board
+            if target_column.board != card.column.board:
+                return Response(
+                    {'detail': 'Cannot move card to a different board'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            with transaction.atomic():
+                old_column = card.column
+                old_position = card.position
+
+                # If moving within the same column
+                if old_column == target_column:
+                    if new_position > old_position:
+                        # Moving down: decrease position of cards between old and new position
+                        Card.objects.filter(
+                            column=old_column,
+                            position__gt=old_position,
+                            position__lte=new_position
+                        ).update(position=Q(position=Q(position - 1)))
+                    elif new_position < old_position:
+                        # Moving up: increase position of cards between new and old position
+                        Card.objects.filter(
+                            column=old_column,
+                            position__gte=new_position,
+                            position__lt=old_position
+                        ).update(position=Q(position=Q(position + 1)))
+                else:
+                    # Moving to different column
+                    # Decrease position of cards after old position in old column
+                    Card.objects.filter(
+                        column=old_column,
+                        position__gt=old_position
+                    ).update(position=Q(position=Q(position - 1)))
+
+                    # Increase position of cards at or after new position in target column
+                    Card.objects.filter(
+                        column=target_column,
+                        position__gte=new_position
+                    ).update(position=Q(position=Q(position + 1)))
+
+                # Update card
+                card.column = target_column
+                card.position = new_position
+                card.save()
+
+            response_serializer = CardSerializer(card)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CardSearchView(APIView):
+    """
+    API endpoint for searching cards
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: CardSerializer(many=True)},
+        description="Search cards by title, description or labels within a board"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        board_id = request.query_params.get('board_id')
+        search_query = request.query_params.get('q')
+        labels_filter = request.query_params.get('labels')
+
+        if not board_id:
+            return Response(
+                {'detail': 'board_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not search_query:
+            return Response(
+                {'detail': 'q parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            board = Board.objects.get(id=board_id)
+        except Board.DoesNotExist:
+            return Response(
+                {'detail': 'Board not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Get all columns for this board
+        columns = Column.objects.filter(board=board)
+        
+        # Search cards by title or description
+        cards = Card.objects.filter(
+            column__in=columns
+        ).filter(
+            Q(title__icontains=search_query) | Q(description__icontains=search_query)
+        ).prefetch_related('checklists', 'comments', 'card_labels__label')
+
+        # Filter by labels if provided
+        if labels_filter:
+            label_names = [name.strip() for name in labels_filter.split(',') if name.strip()]
+            if label_names:
+                from .models import Label, CardLabel
+                labels = Label.objects.filter(board=board, name__in=label_names)
+                card_ids = CardLabel.objects.filter(label__in=labels).values_list('card_id', flat=True)
+                cards = cards.filter(id__in=card_ids)
+
+        serializer = CardSerializer(cards.distinct(), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

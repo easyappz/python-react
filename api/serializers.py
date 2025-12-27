@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member, Board, BoardMember, Column
+from .models import Member, Board, BoardMember, Column, Card, Label, CardLabel, Checklist, Comment
 
 
 class MessageSerializer(serializers.Serializer):
@@ -139,4 +139,106 @@ class ColumnReorderSerializer(serializers.Serializer):
         for item in value:
             if 'id' not in item or 'position' not in item:
                 raise serializers.ValidationError("Each item must have 'id' and 'position' fields")
+        return value
+
+
+class LabelSerializer(serializers.ModelSerializer):
+    """Serializer for Label model"""
+    
+    class Meta:
+        model = Label
+        fields = ['id', 'name', 'color']
+        read_only_fields = ['id']
+
+
+class ChecklistItemSerializer(serializers.Serializer):
+    """Serializer for checklist items"""
+    id = serializers.IntegerField(read_only=True)
+    text = serializers.CharField(max_length=500)
+    is_completed = serializers.BooleanField(default=False)
+
+
+class ChecklistSerializer(serializers.ModelSerializer):
+    """Serializer for Checklist model"""
+    items = ChecklistItemSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Checklist
+        fields = ['id', 'title', 'items']
+        read_only_fields = ['id']
+
+
+class CardSerializer(serializers.ModelSerializer):
+    """Serializer for Card model with nested data"""
+    labels = LabelSerializer(many=True, read_only=True, source='card_labels.label')
+    checklists = ChecklistSerializer(many=True, read_only=True)
+    comments_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Card
+        fields = ['id', 'column', 'title', 'description', 'position', 'due_date', 'created_at', 'labels', 'checklists', 'comments_count']
+        read_only_fields = ['id', 'created_at']
+    
+    def get_comments_count(self, obj):
+        """Get count of comments for the card"""
+        return obj.comments.count()
+    
+    def to_representation(self, instance):
+        """Custom representation to handle labels properly"""
+        representation = super().to_representation(instance)
+        # Get labels through CardLabel relationship
+        card_labels = CardLabel.objects.filter(card=instance).select_related('label')
+        representation['labels'] = LabelSerializer([cl.label for cl in card_labels], many=True).data
+        return representation
+
+
+class CardCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new card"""
+    labels = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    
+    class Meta:
+        model = Card
+        fields = ['column', 'title', 'description', 'position', 'due_date', 'labels']
+    
+    def validate_column(self, value):
+        """Check if column exists"""
+        if not Column.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Column not found")
+        return value
+    
+    def create(self, validated_data):
+        """Create card and handle labels"""
+        labels_str = validated_data.pop('labels', None)
+        card = Card.objects.create(**validated_data)
+        
+        # Handle labels if provided
+        if labels_str:
+            label_names = [name.strip() for name in labels_str.split(',') if name.strip()]
+            board = card.column.board
+            for label_name in label_names:
+                label, created = Label.objects.get_or_create(
+                    board=board,
+                    name=label_name,
+                    defaults={'color': '#61BD4F'}
+                )
+                CardLabel.objects.create(card=card, label=label)
+        
+        return card
+
+
+class CardMoveSerializer(serializers.Serializer):
+    """Serializer for moving a card"""
+    column = serializers.IntegerField(required=True)
+    position = serializers.IntegerField(required=True)
+    
+    def validate_column(self, value):
+        """Check if column exists"""
+        if not Column.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Column not found")
+        return value
+    
+    def validate_position(self, value):
+        """Validate position is non-negative"""
+        if value < 0:
+            raise serializers.ValidationError("Position must be non-negative")
         return value

@@ -5,6 +5,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.utils import timezone
 from django.db.models import Q, F
 from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from drf_spectacular.utils import extend_schema
 from .serializers import (
     MessageSerializer, RegisterSerializer, LoginSerializer, MemberSerializer,
@@ -35,6 +37,7 @@ class HelloView(APIView):
         return Response(serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     """
     API endpoint for user registration
@@ -54,6 +57,7 @@ class RegisterView(APIView):
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     """
     API endpoint for user login

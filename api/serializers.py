@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member
+from .models import Member, Board, BoardMember, Column
 
 
 class MessageSerializer(serializers.Serializer):
@@ -58,3 +58,85 @@ class LoginSerializer(serializers.Serializer):
     """Serializer for user login"""
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
+
+
+class BoardSerializer(serializers.ModelSerializer):
+    """Serializer for Board model"""
+    owner = MemberSerializer(read_only=True)
+    
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'description', 'background_color', 'owner', 'created_at']
+        read_only_fields = ['id', 'owner', 'created_at']
+
+
+class BoardCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new board"""
+    
+    class Meta:
+        model = Board
+        fields = ['title', 'description', 'background_color']
+    
+    def validate_background_color(self, value):
+        """Validate hex color format"""
+        if value and not value.startswith('#'):
+            raise serializers.ValidationError("Color must be in hex format (e.g., #0079BF)")
+        if value and len(value) != 7:
+            raise serializers.ValidationError("Color must be 7 characters long (e.g., #0079BF)")
+        return value
+
+
+class BoardInviteSerializer(serializers.Serializer):
+    """Serializer for inviting members to board"""
+    member_id = serializers.IntegerField(required=True)
+    
+    def validate_member_id(self, value):
+        """Check if member exists"""
+        if not Member.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Member not found")
+        return value
+
+
+class ColumnSerializer(serializers.ModelSerializer):
+    """Serializer for Column model"""
+    
+    class Meta:
+        model = Column
+        fields = ['id', 'board', 'title', 'position']
+        read_only_fields = ['id']
+
+
+class ColumnCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new column"""
+    
+    class Meta:
+        model = Column
+        fields = ['board', 'title', 'position']
+    
+    def validate_board(self, value):
+        """Check if board exists"""
+        if not Board.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Board not found")
+        return value
+
+
+class ColumnReorderSerializer(serializers.Serializer):
+    """Serializer for reordering columns"""
+    board = serializers.IntegerField(required=True)
+    column_orders = serializers.ListField(
+        child=serializers.DictField(),
+        required=True
+    )
+    
+    def validate_board(self, value):
+        """Check if board exists"""
+        if not Board.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Board not found")
+        return value
+    
+    def validate_column_orders(self, value):
+        """Validate column orders structure"""
+        for item in value:
+            if 'id' not in item or 'position' not in item:
+                raise serializers.ValidationError("Each item must have 'id' and 'position' fields")
+        return value

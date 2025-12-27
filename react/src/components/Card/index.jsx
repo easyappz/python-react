@@ -2,7 +2,11 @@ import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import './styles.css';
 
-export const Card = ({ card, index, onEdit, onDelete }) => {
+export const Card = ({ card, index, onEdit }) => {
+  const handleClick = () => {
+    onEdit(card);
+  };
+
   return (
     <Draggable draggableId={`card-${card.id}`} index={index}>
       {(provided, snapshot) => (
@@ -11,6 +15,7 @@ export const Card = ({ card, index, onEdit, onDelete }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={`card ${snapshot.isDragging ? 'dragging' : ''}`}
+          onClick={handleClick}
           data-easytag="id1-react/src/components/Card/index.jsx"
           data-testid={`card-${card.id}`}
         >
@@ -31,28 +36,6 @@ export const Card = ({ card, index, onEdit, onDelete }) => {
                 {new Date(card.due_date).toLocaleDateString('ru-RU')}
               </div>
             )}
-          </div>
-          <div className="card-actions">
-            <button
-              className="card-action-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(card);
-              }}
-              data-testid="edit-card-btn"
-            >
-              ✏️
-            </button>
-            <button
-              className="card-action-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(card.id);
-              }}
-              data-testid="delete-card-btn"
-            >
-              🗑️
-            </button>
           </div>
         </div>
       )}

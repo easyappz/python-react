@@ -1,0 +1,364 @@
+[
+  {
+    "name": "Открытие модального окна карточки",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='card-modal']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='card-title']"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование названия карточки",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='card-title']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='card-title-input']",
+        "value": "Обновленное название"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='card-title-input']"
+      }
+    ]
+  },
+  {
+    "name": "Добавление описания карточки",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='tab-description']"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='description-view']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='description-textarea']",
+        "value": "Описание тестовой карточки"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='save-description-btn']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='description-textarea']"
+      }
+    ]
+  },
+  {
+    "name": "Добавление чек-листа",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='tab-checklists']"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-checklist-btn']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='checklist-title-input']",
+        "value": "Тестовый чек-лист"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='save-checklist-btn']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='add-checklist-btn']"
+      }
+    ]
+  },
+  {
+    "name": "Добавление комментария",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='tab-comments']"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='comment-textarea']",
+        "value": "Тестовый комментарий"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-comment-btn']"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='comment-textarea']"
+      }
+    ]
+  },
+  {
+    "name": "Закрытие модального окна",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-email']",
+        "value": "test@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='login-password']",
+        "value": "password123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='board-card-']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid^='card-']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='close-modal-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='board-page']"
+      }
+    ]
+  }
+]

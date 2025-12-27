@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from .serializers import (
@@ -14,7 +14,8 @@ from .serializers import (
     ChecklistSerializer, ChecklistCreateSerializer, ChecklistItemSerializer,
     CommentSerializer, CommentCreateSerializer,
     LabelSerializer, LabelCreateSerializer,
-    AttachmentSerializer
+    AttachmentSerializer,
+    ProfileUpdateSerializer
 )
 from .models import Member, Board, BoardMember, Column, Card, Checklist, ChecklistItem, Comment, Label, Attachment
 import os
@@ -141,6 +142,57 @@ class MeView(APIView):
                 {'detail': 'Authentication required'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+
+class UserProfileView(APIView):
+    """
+    API endpoint for user profile management
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    @extend_schema(
+        responses={200: MemberSerializer},
+        description="Retrieve current user profile information"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = MemberSerializer(member)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=ProfileUpdateSerializer,
+        responses={200: MemberSerializer},
+        description="Update current user profile (username and/or avatar)"
+    )
+    def patch(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = ProfileUpdateSerializer(member, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_serializer = MemberSerializer(member)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BoardListCreateView(APIView):
@@ -908,27 +960,27 @@ class CardMoveView(APIView):
                             column=old_column,
                             position__gt=old_position,
                             position__lte=new_position
-                        ).update(position=Q(position=Q(position - 1)))
+                        ).update(position=F('position') - 1)
                     elif new_position < old_position:
                         # Moving up: increase position of cards between new and old position
                         Card.objects.filter(
                             column=old_column,
                             position__gte=new_position,
                             position__lt=old_position
-                        ).update(position=Q(position=Q(position + 1)))
+                        ).update(position=F('position') + 1)
                 else:
                     # Moving to different column
                     # Decrease position of cards after old position in old column
                     Card.objects.filter(
                         column=old_column,
                         position__gt=old_position
-                    ).update(position=Q(position=Q(position - 1)))
+                    ).update(position=F('position') - 1)
 
                     # Increase position of cards at or after new position in target column
                     Card.objects.filter(
                         column=target_column,
                         position__gte=new_position
-                    ).update(position=Q(position=Q(position + 1)))
+                    ).update(position=F('position') + 1)
 
                 # Update card
                 card.column = target_column

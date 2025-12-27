@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext } from '@hello-pangea/dnd';
 import { Column } from '../Column';
 import { AddColumn } from '../AddColumn';
 import { InviteModal } from '../InviteModal';

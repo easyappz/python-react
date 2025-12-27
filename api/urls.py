@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import HelloView, RegisterView, LoginView, LogoutView, MeView
+from .views import (
+    HelloView, RegisterView, LoginView, LogoutView, MeView,
+    BoardListCreateView, BoardDetailView, BoardInviteView,
+    ColumnListCreateView, ColumnDetailView, ColumnReorderView
+)
 
 urlpatterns = [
     path("hello/", HelloView.as_view(), name="hello"),
@@ -7,4 +11,14 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
+    
+    # Board endpoints
+    path("boards/", BoardListCreateView.as_view(), name="boards-list"),
+    path("boards/<int:id>/", BoardDetailView.as_view(), name="boards-detail"),
+    path("boards/<int:id>/invite/", BoardInviteView.as_view(), name="boards-invite"),
+    
+    # Column endpoints
+    path("columns/", ColumnListCreateView.as_view(), name="columns-list"),
+    path("columns/<int:id>/", ColumnDetailView.as_view(), name="columns-detail"),
+    path("columns/reorder/", ColumnReorderView.as_view(), name="columns-reorder"),
 ]

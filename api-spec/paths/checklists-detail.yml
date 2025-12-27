@@ -1,0 +1,87 @@
+path: /api/checklists/{id}/
+isSecure: true
+
+methods:
+  get:
+    summary: Get checklist details
+    description: Retrieve a specific checklist
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Checklist details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                title:
+                  type: string
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  patch:
+    summary: Update checklist
+    description: Update a specific checklist
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+    responses:
+      '200':
+        description: Checklist updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                title:
+                  type: string
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  delete:
+    summary: Delete checklist
+    description: Delete a specific checklist
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Checklist deleted
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found

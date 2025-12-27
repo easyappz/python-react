@@ -1,0 +1,78 @@
+path: /api/comments/
+isSecure: true
+
+methods:
+  get:
+    summary: Get comments for a card
+    description: Retrieve all comments for a specific card
+    parameters:
+      - name: card
+        in: query
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+    responses:
+      '200':
+        description: List of comments
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  card:
+                    type: integer
+                  author:
+                    type: integer
+                  text:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      '401':
+        description: Unauthorized
+
+  post:
+    summary: Create a comment
+    description: Create a new comment on a card
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - card
+              - text
+            properties:
+              card:
+                type: integer
+              text:
+                type: string
+    responses:
+      '201':
+        description: Comment created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                author:
+                  type: integer
+                text:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized

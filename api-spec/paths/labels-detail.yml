@@ -1,0 +1,93 @@
+path: /api/labels/{id}/
+isSecure: true
+
+methods:
+  get:
+    summary: Get label details
+    description: Retrieve a specific label
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Label details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                board:
+                  type: integer
+                name:
+                  type: string
+                color:
+                  type: string
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  patch:
+    summary: Update label
+    description: Update a specific label
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              color:
+                type: string
+    responses:
+      '200':
+        description: Label updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                board:
+                  type: integer
+                name:
+                  type: string
+                color:
+                  type: string
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  delete:
+    summary: Delete label
+    description: Delete a specific label
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Label deleted
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found

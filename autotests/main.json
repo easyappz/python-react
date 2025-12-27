@@ -5,7 +5,7 @@
       "filepath": "home.json"
     },
     {
-      "name": "Тестирование авторизации",
+      "name": "Тестирование страницы авторизации",
       "filepath": "auth.json"
     },
     {
@@ -13,8 +13,12 @@
       "filepath": "dashboard.json"
     },
     {
-      "name": "Тестирование доски",
+      "name": "Тестирование страницы доски",
       "filepath": "board.json"
+    },
+    {
+      "name": "Тестирование модального окна карточки",
+      "filepath": "card-modal.json"
     }
   ]
 }

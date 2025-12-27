@@ -1,0 +1,195 @@
+[
+  {
+    "name": "Переход на страницу профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "profiletest@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "profileuser"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='confirm-password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='nav-profile']"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/profile"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='profile-page']"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='profile-email']",
+        "expectedText": "profiletest@example.com"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='profile-username']",
+        "expectedText": "profileuser"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "editprofile@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "oldusername"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='confirm-password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='nav-profile']"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='edit-profile-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "newusername"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='save-profile-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='profile-username']",
+        "expectedText": "newusername"
+      }
+    ]
+  },
+  {
+    "name": "Отображение статистики профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "statsuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "statsuser"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='confirm-password-input']",
+        "value": "testpass123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='nav-profile']"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='stat-boards']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='stat-cards']"
+      }
+    ]
+  }
+]

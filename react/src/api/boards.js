@@ -24,3 +24,10 @@ export const deleteBoard = async (id) => {
   const response = await instance.delete(`/api/boards/${id}/`);
   return response.data;
 };
+
+export const inviteToBoard = async (id, memberId) => {
+  const response = await instance.post(`/api/boards/${id}/invite/`, {
+    member_id: memberId
+  });
+  return response.data;
+};

@@ -18,6 +18,26 @@ paths:
     $ref: './paths/auth-me.yml'
   /users/profile/:
     $ref: './paths/users-profile.yml'
+  /boards/:
+    $ref: './paths/boards-list.yml'
+  /boards/{id}/:
+    $ref: './paths/boards-detail.yml'
+  /boards/{id}/invite/:
+    $ref: './paths/boards-invite.yml'
+  /columns/:
+    $ref: './paths/columns-list.yml'
+  /columns/{id}/:
+    $ref: './paths/columns-detail.yml'
+  /columns/reorder/:
+    $ref: './paths/columns-reorder.yml'
+  /cards/:
+    $ref: './paths/cards-list.yml'
+  /cards/{id}/:
+    $ref: './paths/cards-detail.yml'
+  /cards/{id}/move/:
+    $ref: './paths/cards-move.yml'
+  /cards/search/:
+    $ref: './paths/cards-search.yml'
 
 components:
   schemas:
@@ -43,6 +63,89 @@ components:
       required:
         - email
         - username
+
+    Board:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        background_color:
+          type: string
+          maxLength: 7
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          default: "#0079BF"
+        owner:
+          type: integer
+          readOnly: true
+        members:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - title
+
+    Column:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        board:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        position:
+          type: integer
+          default: 0
+      required:
+        - board
+        - title
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        column:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          default: 0
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+        labels:
+          type: string
+          nullable: true
+          description: Comma-separated labels
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - column
+        - title
 
     Error:
       type: object

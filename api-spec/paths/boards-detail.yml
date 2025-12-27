@@ -1,0 +1,138 @@
+get:
+  summary: Get board details
+  description: Retrieve detailed information about a specific board
+  operationId: getBoard
+  tags:
+    - Boards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Board ID
+  responses:
+    '200':
+      description: Successfully retrieved board
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Board'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+patch:
+  summary: Update board
+  description: Update board information (only owner can update)
+  operationId: updateBoard
+  tags:
+    - Boards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Board ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              maxLength: 255
+            description:
+              type: string
+              nullable: true
+            background_color:
+              type: string
+              maxLength: 7
+              pattern: '^#[0-9A-Fa-f]{6}$'
+  responses:
+    '200':
+      description: Board successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Board'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+delete:
+  summary: Delete board
+  description: Delete board (only owner can delete)
+  operationId: deleteBoard
+  tags:
+    - Boards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Board ID
+  responses:
+    '204':
+      description: Board successfully deleted
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

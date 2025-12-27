@@ -1,0 +1,65 @@
+post:
+  summary: Reorder columns
+  description: Change the order of columns in a board
+  operationId: reorderColumns
+  tags:
+    - Columns
+  x-isSecure: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            board:
+              type: integer
+              description: Board ID
+            column_orders:
+              type: array
+              description: Array of column IDs in new order
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  position:
+                    type: integer
+          required:
+            - board
+            - column_orders
+  responses:
+    '200':
+      description: Columns successfully reordered
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                example: "Columns reordered successfully"
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

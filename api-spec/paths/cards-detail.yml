@@ -1,0 +1,143 @@
+get:
+  summary: Get card details
+  description: Retrieve detailed information about a specific card
+  operationId: getCard
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Card ID
+  responses:
+    '200':
+      description: Successfully retrieved card
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Card not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+patch:
+  summary: Update card
+  description: Update card information
+  operationId: updateCard
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Card ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              maxLength: 255
+            description:
+              type: string
+              nullable: true
+            position:
+              type: integer
+            due_date:
+              type: string
+              format: date-time
+              nullable: true
+            labels:
+              type: string
+              nullable: true
+  responses:
+    '200':
+      description: Card successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Card not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+delete:
+  summary: Delete card
+  description: Delete card
+  operationId: deleteCard
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Card ID
+  responses:
+    '204':
+      description: Card successfully deleted
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Card not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,100 @@
+get:
+  summary: Get list of columns
+  description: Retrieve all columns for a specific board
+  operationId: listColumns
+  tags:
+    - Columns
+  x-isSecure: true
+  parameters:
+    - name: board_id
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: Board ID to get columns from
+  responses:
+    '200':
+      description: Successfully retrieved columns list
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Column'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+post:
+  summary: Create new column
+  description: Create a new column in a board
+  operationId: createColumn
+  tags:
+    - Columns
+  x-isSecure: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            board:
+              type: integer
+              description: Board ID
+            title:
+              type: string
+              maxLength: 255
+            position:
+              type: integer
+              description: Column position (order)
+              default: 0
+          required:
+            - board
+            - title
+  responses:
+    '201':
+      description: Column successfully created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Column'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

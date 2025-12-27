@@ -1,0 +1,69 @@
+get:
+  summary: Get list of boards
+  description: Retrieve all boards where user is owner or member
+  operationId: listBoards
+  tags:
+    - Boards
+  x-isSecure: true
+  responses:
+    '200':
+      description: Successfully retrieved boards list
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Board'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+post:
+  summary: Create new board
+  description: Create a new board with authenticated user as owner
+  operationId: createBoard
+  tags:
+    - Boards
+  x-isSecure: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              maxLength: 255
+            description:
+              type: string
+              nullable: true
+            background_color:
+              type: string
+              maxLength: 7
+              default: "#0079BF"
+              pattern: '^#[0-9A-Fa-f]{6}$'
+          required:
+            - title
+  responses:
+    '201':
+      description: Board successfully created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Board'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

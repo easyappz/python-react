@@ -1,0 +1,61 @@
+post:
+  summary: Move card
+  description: Move card to another column or change position
+  operationId: moveCard
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Card ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            column:
+              type: integer
+              description: Target column ID
+            position:
+              type: integer
+              description: New position in target column
+          required:
+            - column
+            - position
+  responses:
+    '200':
+      description: Card successfully moved
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Card or column not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

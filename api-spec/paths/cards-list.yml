@@ -1,0 +1,111 @@
+get:
+  summary: Get list of cards
+  description: Retrieve all cards for a specific column
+  operationId: listCards
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: column_id
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: Column ID to get cards from
+  responses:
+    '200':
+      description: Successfully retrieved cards list
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Card'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Column not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+post:
+  summary: Create new card
+  description: Create a new card in a column
+  operationId: createCard
+  tags:
+    - Cards
+  x-isSecure: true
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            column:
+              type: integer
+              description: Column ID
+            title:
+              type: string
+              maxLength: 255
+            description:
+              type: string
+              nullable: true
+            position:
+              type: integer
+              description: Card position (order)
+              default: 0
+            due_date:
+              type: string
+              format: date-time
+              nullable: true
+            labels:
+              type: string
+              nullable: true
+              description: Comma-separated labels
+          required:
+            - column
+            - title
+  responses:
+    '201':
+      description: Card successfully created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Column not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

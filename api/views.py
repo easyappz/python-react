@@ -52,6 +52,10 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             member = serializer.save()
+            # Set session cookie for automatic authentication after registration
+            request.session['member_id'] = member.id
+            request.session.save()
+            
             member_serializer = MemberSerializer(member)
             return Response(member_serializer.data, status=status.HTTP_201_CREATED)
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,53 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Header } from '../Header';
+import './styles.css';
 
 export const NotFound = () => {
   const { t } = useLanguage();
 
   return (
-    <div data-easytag="id1-react/src/components/NotFound/index.jsx" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f5f5f5',
-      padding: '20px',
-    }}>
-      <h1 style={{
-        fontSize: '72px',
-        fontWeight: '700',
-        color: '#333',
-        marginBottom: '20px',
-      }}>
-        404
-      </h1>
-      
-      <p style={{
-        fontSize: '24px',
-        color: '#666',
-        marginBottom: '30px',
-        textAlign: 'center',
-      }}>
-        {t('pageNotFound')}
-      </p>
-      
-      <Link
-        to="/"
-        style={{
-          padding: '12px 24px',
-          fontSize: '16px',
-          fontWeight: '600',
-          color: '#fff',
-          backgroundColor: '#0079bf',
-          border: 'none',
-          borderRadius: '4px',
-          textDecoration: 'none',
-        }}
-      >
-        {t('backToHome')}
-      </Link>
+    <div className="notfound-page" data-easytag="id1-react/src/components/NotFound/index.jsx">
+      <Header />
+      <div className="notfound-container">
+        <div className="notfound-content">
+          <h1 className="notfound-code" data-testid="error-code">404</h1>
+          <h2 className="notfound-title" data-testid="error-title">{t('pageNotFound')}</h2>
+          <p className="notfound-description" data-testid="error-description">
+            {t('language') === 'ru'
+              ? 'Страница, которую вы ищете, не существует или была перемещена.'
+              : 'The page you are looking for does not exist or has been moved.'}
+          </p>
+          <Link to="/" className="notfound-button" data-testid="back-home">
+            {t('backToHome')}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

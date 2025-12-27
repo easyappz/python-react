@@ -60,14 +60,36 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True, write_only=True)
 
 
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating user profile"""
+    
+    class Meta:
+        model = Member
+        fields = ['username', 'avatar']
+    
+    def validate_username(self, value):
+        """Check if username already exists (excluding current user)"""
+        instance = self.instance
+        if Member.objects.filter(username=value).exclude(id=instance.id).exists():
+            raise serializers.ValidationError("User with this username already exists")
+        if len(value) < 3:
+            raise serializers.ValidationError("Username must be at least 3 characters")
+        return value
+
+
 class BoardSerializer(serializers.ModelSerializer):
     """Serializer for Board model"""
-    owner = MemberSerializer(read_only=True)
+    owner = serializers.IntegerField(source='owner.id', read_only=True)
+    members = serializers.SerializerMethodField()
     
     class Meta:
         model = Board
-        fields = ['id', 'title', 'description', 'background_color', 'owner', 'created_at']
-        read_only_fields = ['id', 'owner', 'created_at']
+        fields = ['id', 'title', 'description', 'background_color', 'owner', 'members', 'created_at']
+        read_only_fields = ['id', 'owner', 'members', 'created_at']
+    
+    def get_members(self, obj):
+        """Get list of member IDs"""
+        return list(BoardMember.objects.filter(board=obj).values_list('member_id', flat=True))
 
 
 class BoardCreateSerializer(serializers.ModelSerializer):
@@ -180,7 +202,7 @@ class ChecklistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checklist
-        fields = ['id', 'card', 'title']
+        fields = ['id', 'card', 'title', 'items']
         read_only_fields = ['id']
 
 
@@ -231,27 +253,19 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class CardSerializer(serializers.ModelSerializer):
-    """Serializer for Card model with nested data"""
-    labels = LabelSerializer(many=True, read_only=True, source='card_labels.label')
-    checklists = ChecklistSerializer(many=True, read_only=True)
-    comments_count = serializers.SerializerMethodField()
+    """Serializer for Card model - returns labels as comma-separated string per OpenAPI spec"""
+    labels = serializers.SerializerMethodField()
     
     class Meta:
         model = Card
-        fields = ['id', 'column', 'title', 'description', 'position', 'due_date', 'created_at', 'labels', 'checklists', 'comments_count']
+        fields = ['id', 'column', 'title', 'description', 'position', 'due_date', 'labels', 'created_at']
         read_only_fields = ['id', 'created_at']
     
-    def get_comments_count(self, obj):
-        """Get count of comments for the card"""
-        return obj.comments.count()
-    
-    def to_representation(self, instance):
-        """Custom representation to handle labels properly"""
-        representation = super().to_representation(instance)
-        # Get labels through CardLabel relationship
-        card_labels = CardLabel.objects.filter(card=instance).select_related('label')
-        representation['labels'] = LabelSerializer([cl.label for cl in card_labels], many=True).data
-        return representation
+    def get_labels(self, obj):
+        """Get labels as comma-separated string per OpenAPI spec"""
+        card_labels = CardLabel.objects.filter(card=obj).select_related('label')
+        label_names = [cl.label.name for cl in card_labels]
+        return ', '.join(label_names) if label_names else None
 
 
 class CardCreateSerializer(serializers.ModelSerializer):

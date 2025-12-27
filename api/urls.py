@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    HelloView, RegisterView, LoginView, LogoutView, MeView,
+    HelloView, RegisterView, LoginView, LogoutView, MeView, UserProfileView,
     BoardListCreateView, BoardDetailView, BoardInviteView,
     ColumnListCreateView, ColumnDetailView, ColumnReorderView,
     CardListCreateView, CardDetailView, CardMoveView, CardSearchView,
@@ -17,6 +17,9 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
+    
+    # User profile endpoint
+    path("users/profile/", UserProfileView.as_view(), name="users-profile"),
     
     # Board endpoints
     path("boards/", BoardListCreateView.as_view(), name="boards-list"),

@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Trello Clone API
+  description: API specification for Trello-like application
+  version: 1.0.0
+servers:
+  - url: /api
+    description: API server
+
+paths:
+  /auth/register/:
+    $ref: './paths/auth-register.yml'
+  /auth/login/:
+    $ref: './paths/auth-login.yml'
+  /auth/logout/:
+    $ref: './paths/auth-logout.yml'
+  /auth/me/:
+    $ref: './paths/auth-me.yml'
+  /users/profile/:
+    $ref: './paths/users-profile.yml'
+
+components:
+  schemas:
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          maxLength: 150
+        avatar:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - email
+        - username
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

@@ -1,0 +1,62 @@
+post:
+  summary: User login
+  description: Authenticate user and create session
+  operationId: loginUser
+  tags:
+    - Authentication
+  x-isSecure: false
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              description: User email address
+            password:
+              type: string
+              description: User password
+          required:
+            - email
+            - password
+  responses:
+    '200':
+      description: Successfully authenticated
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+            example: sessionid=abc123; HttpOnly; Path=/; SameSite=Lax
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              email:
+                type: string
+              username:
+                type: string
+              avatar:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+    '400':
+      description: Invalid credentials
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+          examples:
+            invalidCredentials:
+              value:
+                detail: "Invalid email or password"

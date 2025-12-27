@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Регистрация и переход на дашборд",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/register"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "testuser"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='email-input']",
+        "value": "testuser@example.com"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "TestPassword123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-confirm-input']",
+        "value": "TestPassword123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='register-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='empty-state']"
+      }
+    ]
+  },
+  {
+    "name": "Создание новой доски",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/login"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='username-input']",
+        "value": "testuser"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "TestPassword123"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='login-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='create-board-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='board-title-input']",
+        "value": "Моя первая доска"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='board-description-input']",
+        "value": "Описание тестовой доски"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='submit-board-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='boards-grid']"
+      },
+      {
+        "type": "text",
+        "selector": ".board-card-title",
+        "expectedText": "Моя первая доска"
+      }
+    ]
+  },
+  {
+    "name": "Поиск досок",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='search-boards-input']",
+        "value": "Моя первая"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "count",
+        "selector": ".board-card",
+        "expectedCount": 1
+      }
+    ]
+  }
+]

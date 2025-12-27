@@ -1,0 +1,68 @@
+path: /api/checklists/
+isSecure: true
+
+methods:
+  get:
+    summary: Get checklists for a card
+    description: Retrieve all checklists for a specific card
+    parameters:
+      - name: card
+        in: query
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+    responses:
+      '200':
+        description: List of checklists
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  card:
+                    type: integer
+                  title:
+                    type: string
+      '401':
+        description: Unauthorized
+
+  post:
+    summary: Create a new checklist
+    description: Create a new checklist for a card
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - card
+              - title
+            properties:
+              card:
+                type: integer
+              title:
+                type: string
+    responses:
+      '201':
+        description: Checklist created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                title:
+                  type: string
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized

@@ -1,0 +1,81 @@
+path: /api/attachments/
+isSecure: true
+
+methods:
+  get:
+    summary: Get attachments for a card
+    description: Retrieve all attachments for a specific card
+    parameters:
+      - name: card
+        in: query
+        required: true
+        schema:
+          type: integer
+        description: Card ID
+    responses:
+      '200':
+        description: List of attachments
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  card:
+                    type: integer
+                  file:
+                    type: string
+                  filename:
+                    type: string
+                  uploaded_at:
+                    type: string
+                    format: date-time
+      '401':
+        description: Unauthorized
+
+  post:
+    summary: Upload an attachment
+    description: Upload a new file attachment to a card
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - card
+              - file
+            properties:
+              card:
+                type: integer
+              file:
+                type: string
+                format: binary
+              filename:
+                type: string
+    responses:
+      '201':
+        description: Attachment uploaded
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                file:
+                  type: string
+                filename:
+                  type: string
+                uploaded_at:
+                  type: string
+                  format: date-time
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized

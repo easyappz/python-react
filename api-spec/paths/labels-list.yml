@@ -1,0 +1,75 @@
+path: /api/labels/
+isSecure: true
+
+methods:
+  get:
+    summary: Get labels for a board
+    description: Retrieve all labels for a specific board
+    parameters:
+      - name: board
+        in: query
+        required: true
+        schema:
+          type: integer
+        description: Board ID
+    responses:
+      '200':
+        description: List of labels
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  board:
+                    type: integer
+                  name:
+                    type: string
+                  color:
+                    type: string
+      '401':
+        description: Unauthorized
+
+  post:
+    summary: Create a label
+    description: Create a new label for a board
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - board
+              - name
+              - color
+            properties:
+              board:
+                type: integer
+              name:
+                type: string
+              color:
+                type: string
+    responses:
+      '201':
+        description: Label created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                board:
+                  type: integer
+                name:
+                  type: string
+                color:
+                  type: string
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized

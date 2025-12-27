@@ -1,0 +1,135 @@
+path: /api/checklist-items/
+isSecure: true
+
+methods:
+  get:
+    summary: Get checklist items
+    description: Retrieve all items for a specific checklist
+    parameters:
+      - name: checklist
+        in: query
+        required: true
+        schema:
+          type: integer
+        description: Checklist ID
+    responses:
+      '200':
+        description: List of checklist items
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  checklist:
+                    type: integer
+                  text:
+                    type: string
+                  is_completed:
+                    type: boolean
+      '401':
+        description: Unauthorized
+
+  post:
+    summary: Create checklist item
+    description: Create a new item in a checklist
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - checklist
+              - text
+            properties:
+              checklist:
+                type: integer
+              text:
+                type: string
+              is_completed:
+                type: boolean
+                default: false
+    responses:
+      '201':
+        description: Checklist item created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                checklist:
+                  type: integer
+                text:
+                  type: string
+                is_completed:
+                  type: boolean
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized
+
+  patch:
+    summary: Update checklist item
+    description: Update a specific checklist item by ID in query params
+    parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+              is_completed:
+                type: boolean
+    responses:
+      '200':
+        description: Checklist item updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                checklist:
+                  type: integer
+                text:
+                  type: string
+                is_completed:
+                  type: boolean
+      '400':
+        description: Bad request
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  delete:
+    summary: Delete checklist item
+    description: Delete a specific checklist item by ID in query params
+    parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Checklist item deleted
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found

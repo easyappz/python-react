@@ -1,0 +1,53 @@
+path: /api/attachments/{id}/
+isSecure: true
+
+methods:
+  get:
+    summary: Get attachment details
+    description: Retrieve a specific attachment
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Attachment details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                card:
+                  type: integer
+                file:
+                  type: string
+                filename:
+                  type: string
+                uploaded_at:
+                  type: string
+                  format: date-time
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found
+
+  delete:
+    summary: Delete attachment
+    description: Delete a specific attachment
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Attachment deleted
+      '401':
+        description: Unauthorized
+      '404':
+        description: Not found

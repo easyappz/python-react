@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.utils import timezone
 from django.db.models import Q
 from django.db import transaction
@@ -9,9 +10,14 @@ from .serializers import (
     MessageSerializer, RegisterSerializer, LoginSerializer, MemberSerializer,
     BoardSerializer, BoardCreateSerializer, BoardInviteSerializer,
     ColumnSerializer, ColumnCreateSerializer, ColumnReorderSerializer,
-    CardSerializer, CardCreateSerializer, CardMoveSerializer
+    CardSerializer, CardCreateSerializer, CardMoveSerializer,
+    ChecklistSerializer, ChecklistCreateSerializer, ChecklistItemSerializer,
+    CommentSerializer, CommentCreateSerializer,
+    LabelSerializer, LabelCreateSerializer,
+    AttachmentSerializer
 )
-from .models import Member, Board, BoardMember, Column, Card
+from .models import Member, Board, BoardMember, Column, Card, Checklist, ChecklistItem, Comment, Label, Attachment
+import os
 
 
 class HelloView(APIView):
@@ -1016,3 +1022,962 @@ class CardSearchView(APIView):
 
         serializer = CardSerializer(cards.distinct(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChecklistListCreateView(APIView):
+    """
+    API endpoint for listing and creating checklists
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: ChecklistSerializer(many=True)},
+        description="Retrieve all checklists for a specific card"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        card_id = request.query_params.get('card')
+        if not card_id:
+            return Response(
+                {'detail': 'card parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=card_id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        checklists = Checklist.objects.filter(card=card).prefetch_related('items')
+        serializer = ChecklistSerializer(checklists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=ChecklistCreateSerializer,
+        responses={201: ChecklistSerializer},
+        description="Create a new checklist for a card"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = ChecklistCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            card = serializer.validated_data['card']
+            board = card.column.board
+            
+            if not self._has_board_access(board, member):
+                return Response(
+                    {'detail': 'Access forbidden'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            checklist = serializer.save()
+            response_serializer = ChecklistSerializer(checklist)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChecklistDetailView(APIView):
+    """
+    API endpoint for retrieving, updating, and deleting a specific checklist
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: ChecklistSerializer},
+        description="Retrieve a specific checklist"
+    )
+    def get(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            checklist = Checklist.objects.select_related('card__column__board').prefetch_related('items').get(id=id)
+        except Checklist.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ChecklistSerializer(checklist)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=ChecklistSerializer,
+        responses={200: ChecklistSerializer},
+        description="Update a specific checklist"
+    )
+    def patch(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            checklist = Checklist.objects.select_related('card__column__board').get(id=id)
+        except Checklist.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ChecklistSerializer(checklist, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete a specific checklist"
+    )
+    def delete(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            checklist = Checklist.objects.select_related('card__column__board').get(id=id)
+        except Checklist.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        checklist.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ChecklistItemListCreateView(APIView):
+    """
+    API endpoint for listing, creating, updating, and deleting checklist items
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: ChecklistItemSerializer(many=True)},
+        description="Retrieve all items for a specific checklist"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        checklist_id = request.query_params.get('checklist')
+        if not checklist_id:
+            return Response(
+                {'detail': 'checklist parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            checklist = Checklist.objects.select_related('card__column__board').get(id=checklist_id)
+        except Checklist.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        items = ChecklistItem.objects.filter(checklist=checklist)
+        serializer = ChecklistItemSerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=ChecklistItemSerializer,
+        responses={201: ChecklistItemSerializer},
+        description="Create a new item in a checklist"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = ChecklistItemSerializer(data=request.data)
+        if serializer.is_valid():
+            checklist = serializer.validated_data['checklist']
+            board = checklist.card.column.board
+            
+            if not self._has_board_access(board, member):
+                return Response(
+                    {'detail': 'Access forbidden'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            item = serializer.save()
+            return Response(ChecklistItemSerializer(item).data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        request=ChecklistItemSerializer,
+        responses={200: ChecklistItemSerializer},
+        description="Update a specific checklist item"
+    )
+    def patch(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        item_id = request.query_params.get('id')
+        if not item_id:
+            return Response(
+                {'detail': 'id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            item = ChecklistItem.objects.select_related('checklist__card__column__board').get(id=item_id)
+        except ChecklistItem.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist item not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(item.checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ChecklistItemSerializer(item, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete a specific checklist item"
+    )
+    def delete(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        item_id = request.query_params.get('id')
+        if not item_id:
+            return Response(
+                {'detail': 'id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            item = ChecklistItem.objects.select_related('checklist__card__column__board').get(id=item_id)
+        except ChecklistItem.DoesNotExist:
+            return Response(
+                {'detail': 'Checklist item not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(item.checklist.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentListCreateView(APIView):
+    """
+    API endpoint for listing and creating comments
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: CommentSerializer(many=True)},
+        description="Retrieve all comments for a specific card"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        card_id = request.query_params.get('card')
+        if not card_id:
+            return Response(
+                {'detail': 'card parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=card_id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        comments = Comment.objects.filter(card=card).select_related('author')
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=CommentCreateSerializer,
+        responses={201: CommentSerializer},
+        description="Create a new comment on a card"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = CommentCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            card = serializer.validated_data['card']
+            board = card.column.board
+            
+            if not self._has_board_access(board, member):
+                return Response(
+                    {'detail': 'Access forbidden'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            comment = serializer.save(author=member)
+            response_serializer = CommentSerializer(comment)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentDetailView(APIView):
+    """
+    API endpoint for retrieving, updating, and deleting a specific comment
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: CommentSerializer},
+        description="Retrieve a specific comment"
+    )
+    def get(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            comment = Comment.objects.select_related('card__column__board', 'author').get(id=id)
+        except Comment.DoesNotExist:
+            return Response(
+                {'detail': 'Comment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(comment.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=CommentSerializer,
+        responses={200: CommentSerializer},
+        description="Update a specific comment"
+    )
+    def patch(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            comment = Comment.objects.select_related('card__column__board').get(id=id)
+        except Comment.DoesNotExist:
+            return Response(
+                {'detail': 'Comment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(comment.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Only comment author can update
+        if comment.author != member:
+            return Response(
+                {'detail': 'Only comment author can update it'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete a specific comment"
+    )
+    def delete(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            comment = Comment.objects.select_related('card__column__board').get(id=id)
+        except Comment.DoesNotExist:
+            return Response(
+                {'detail': 'Comment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(comment.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Only comment author can delete
+        if comment.author != member:
+            return Response(
+                {'detail': 'Only comment author can delete it'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LabelListCreateView(APIView):
+    """
+    API endpoint for listing and creating labels
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: LabelSerializer(many=True)},
+        description="Retrieve all labels for a specific board"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        board_id = request.query_params.get('board')
+        if not board_id:
+            return Response(
+                {'detail': 'board parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            board = Board.objects.get(id=board_id)
+        except Board.DoesNotExist:
+            return Response(
+                {'detail': 'Board not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        labels = Label.objects.filter(board=board)
+        serializer = LabelSerializer(labels, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=LabelCreateSerializer,
+        responses={201: LabelSerializer},
+        description="Create a new label for a board"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        serializer = LabelCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            board = serializer.validated_data['board']
+            
+            if not self._has_board_access(board, member):
+                return Response(
+                    {'detail': 'Access forbidden'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            label = serializer.save()
+            response_serializer = LabelSerializer(label)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LabelDetailView(APIView):
+    """
+    API endpoint for retrieving, updating, and deleting a specific label
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: LabelSerializer},
+        description="Retrieve a specific label"
+    )
+    def get(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            label = Label.objects.select_related('board').get(id=id)
+        except Label.DoesNotExist:
+            return Response(
+                {'detail': 'Label not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(label.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = LabelSerializer(label)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=LabelSerializer,
+        responses={200: LabelSerializer},
+        description="Update a specific label"
+    )
+    def patch(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            label = Label.objects.select_related('board').get(id=id)
+        except Label.DoesNotExist:
+            return Response(
+                {'detail': 'Label not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(label.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = LabelSerializer(label, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete a specific label"
+    )
+    def delete(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            label = Label.objects.select_related('board').get(id=id)
+        except Label.DoesNotExist:
+            return Response(
+                {'detail': 'Label not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(label.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        label.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AttachmentListCreateView(APIView):
+    """
+    API endpoint for listing and uploading attachments
+    """
+    parser_classes = [MultiPartParser, FormParser]
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: AttachmentSerializer(many=True)},
+        description="Retrieve all attachments for a specific card"
+    )
+    def get(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        card_id = request.query_params.get('card')
+        if not card_id:
+            return Response(
+                {'detail': 'card parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=card_id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        attachments = Attachment.objects.filter(card=card)
+        serializer = AttachmentSerializer(attachments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=AttachmentSerializer,
+        responses={201: AttachmentSerializer},
+        description="Upload a new file attachment to a card"
+    )
+    def post(self, request):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        card_id = request.data.get('card')
+        uploaded_file = request.FILES.get('file')
+        filename = request.data.get('filename', uploaded_file.name if uploaded_file else '')
+
+        if not card_id:
+            return Response(
+                {'detail': 'card field is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not uploaded_file:
+            return Response(
+                {'detail': 'file field is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            card = Card.objects.select_related('column__board').get(id=card_id)
+        except Card.DoesNotExist:
+            return Response(
+                {'detail': 'Card not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Create attachment
+        attachment = Attachment.objects.create(
+            card=card,
+            file=uploaded_file,
+            filename=filename
+        )
+
+        serializer = AttachmentSerializer(attachment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AttachmentDetailView(APIView):
+    """
+    API endpoint for retrieving and deleting a specific attachment
+    """
+
+    def _get_member(self, request):
+        """Helper method to get authenticated member"""
+        member_id = request.session.get('member_id')
+        if not member_id:
+            return None
+        try:
+            return Member.objects.get(id=member_id)
+        except Member.DoesNotExist:
+            return None
+
+    def _has_board_access(self, board, member):
+        """Check if member has access to board"""
+        return board.owner == member or BoardMember.objects.filter(board=board, member=member).exists()
+
+    @extend_schema(
+        responses={200: AttachmentSerializer},
+        description="Retrieve a specific attachment"
+    )
+    def get(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            attachment = Attachment.objects.select_related('card__column__board').get(id=id)
+        except Attachment.DoesNotExist:
+            return Response(
+                {'detail': 'Attachment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(attachment.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = AttachmentSerializer(attachment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        responses={204: None},
+        description="Delete a specific attachment"
+    )
+    def delete(self, request, id):
+        member = self._get_member(request)
+        if not member:
+            return Response(
+                {'detail': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        try:
+            attachment = Attachment.objects.select_related('card__column__board').get(id=id)
+        except Attachment.DoesNotExist:
+            return Response(
+                {'detail': 'Attachment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not self._has_board_access(attachment.card.column.board, member):
+            return Response(
+                {'detail': 'Access forbidden'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Delete file from filesystem
+        if attachment.file:
+            if os.path.isfile(attachment.file.path):
+                os.remove(attachment.file.path)
+
+        attachment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

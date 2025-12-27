@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member, Board, BoardMember, Column, Card, Label, CardLabel, Checklist, Comment
+from .models import Member, Board, BoardMember, Column, Card, Label, CardLabel, Checklist, ChecklistItem, Comment, Attachment
 
 
 class MessageSerializer(serializers.Serializer):
@@ -147,15 +147,31 @@ class LabelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Label
-        fields = ['id', 'name', 'color']
+        fields = ['id', 'board', 'name', 'color']
         read_only_fields = ['id']
 
 
-class ChecklistItemSerializer(serializers.Serializer):
+class LabelCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new label"""
+    
+    class Meta:
+        model = Label
+        fields = ['board', 'name', 'color']
+    
+    def validate_board(self, value):
+        """Check if board exists"""
+        if not Board.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Board not found")
+        return value
+
+
+class ChecklistItemSerializer(serializers.ModelSerializer):
     """Serializer for checklist items"""
-    id = serializers.IntegerField(read_only=True)
-    text = serializers.CharField(max_length=500)
-    is_completed = serializers.BooleanField(default=False)
+    
+    class Meta:
+        model = ChecklistItem
+        fields = ['id', 'checklist', 'text', 'is_completed']
+        read_only_fields = ['id']
 
 
 class ChecklistSerializer(serializers.ModelSerializer):
@@ -164,8 +180,54 @@ class ChecklistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checklist
-        fields = ['id', 'title', 'items']
+        fields = ['id', 'card', 'title']
         read_only_fields = ['id']
+
+
+class ChecklistCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new checklist"""
+    
+    class Meta:
+        model = Checklist
+        fields = ['card', 'title']
+    
+    def validate_card(self, value):
+        """Check if card exists"""
+        if not Card.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Card not found")
+        return value
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Serializer for Comment model"""
+    
+    class Meta:
+        model = Comment
+        fields = ['id', 'card', 'author', 'text', 'created_at']
+        read_only_fields = ['id', 'author', 'created_at']
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating a new comment"""
+    
+    class Meta:
+        model = Comment
+        fields = ['card', 'text']
+    
+    def validate_card(self, value):
+        """Check if card exists"""
+        if not Card.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Card not found")
+        return value
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    """Serializer for Attachment model"""
+    
+    class Meta:
+        model = Attachment
+        fields = ['id', 'card', 'file', 'filename', 'uploaded_at']
+        read_only_fields = ['id', 'uploaded_at']
 
 
 class CardSerializer(serializers.ModelSerializer):

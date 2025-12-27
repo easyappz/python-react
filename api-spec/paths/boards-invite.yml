@@ -1,0 +1,57 @@
+post:
+  summary: Invite user to board
+  description: Add a member to board (only owner can invite)
+  operationId: inviteToBoard
+  tags:
+    - Boards
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Board ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            member_id:
+              type: integer
+              description: ID of member to invite
+          required:
+            - member_id
+  responses:
+    '200':
+      description: Member successfully added to board
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Board'
+    '400':
+      description: Invalid input or member already added
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board or member not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

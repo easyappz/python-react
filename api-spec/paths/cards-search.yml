@@ -1,0 +1,59 @@
+get:
+  summary: Search cards
+  description: Search cards by title, description or labels within a board
+  operationId: searchCards
+  tags:
+    - Cards
+  x-isSecure: true
+  parameters:
+    - name: board_id
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: Board ID to search in
+    - name: q
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Search query
+    - name: labels
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter by labels (comma-separated)
+  responses:
+    '200':
+      description: Successfully retrieved search results
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Card'
+    '400':
+      description: Invalid search parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Board not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

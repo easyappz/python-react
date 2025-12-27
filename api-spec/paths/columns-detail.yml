@@ -1,0 +1,93 @@
+patch:
+  summary: Update column
+  description: Update column information
+  operationId: updateColumn
+  tags:
+    - Columns
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Column ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              maxLength: 255
+            position:
+              type: integer
+  responses:
+    '200':
+      description: Column successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Column'
+    '400':
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Column not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+delete:
+  summary: Delete column
+  description: Delete column and all its cards
+  operationId: deleteColumn
+  tags:
+    - Columns
+  x-isSecure: true
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Column ID
+  responses:
+    '204':
+      description: Column successfully deleted
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '403':
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Column not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

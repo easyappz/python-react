@@ -71,7 +71,7 @@ export const Home = () => {
   return (
     <div className="home-container" data-easytag="id1-src/components/Home/index.jsx">
       <div className="game-wrapper">
-        <h1 className="game-title">Крестики-Нолики</h1>
+        <h1 className="game-title">Крестики х Нолики</h1>
         
         <div className="scoreboard">
           <div className="score-item score-x">

@@ -14,9 +14,11 @@ from .serializers import (
     MemberSerializer,
     MemberRegistrationSerializer,
     MemberLoginSerializer,
-    TransactionSerializer
+    TransactionSerializer,
+    CategorySerializer,
+    UserSettingsSerializer
 )
-from .models import Member, Transaction, Category
+from .models import Member, Transaction, Category, UserSettings
 from .authentication import SessionAuthentication
 from .permissions import IsAuthenticated
 
@@ -382,3 +384,93 @@ class TransactionViewSet(viewsets.ModelViewSet):
         )
         response['Content-Disposition'] = 'attachment; filename="transactions.xlsx"'
         return response
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing categories
+    """
+    serializer_class = CategorySerializer
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Get categories for current user with filtering
+        """
+        queryset = Category.objects.filter(member=self.request.user)
+        
+        # Filter by type
+        category_type = self.request.query_params.get('type', None)
+        if category_type:
+            queryset = queryset.filter(type=category_type)
+        
+        return queryset
+
+    def perform_create(self, serializer):
+        """
+        Set member to current user on create
+        """
+        serializer.save(member=self.request.user)
+
+    def perform_update(self, serializer):
+        """
+        Ensure member stays the same on update
+        """
+        serializer.save(member=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Prevent deletion of default categories
+        """
+        category = self.get_object()
+        
+        if category.is_default:
+            return Response(
+                {'error': 'Cannot delete default category'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return super().destroy(request, *args, **kwargs)
+
+
+class UserSettingsViewSet(viewsets.ViewSet):
+    """
+    ViewSet for managing user settings
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request):
+        """
+        Get current user settings
+        """
+        try:
+            settings = UserSettings.objects.get(member=request.user)
+        except UserSettings.DoesNotExist:
+            # Create default settings if they don't exist
+            settings = UserSettings.objects.create(member=request.user)
+        
+        serializer = UserSettingsSerializer(settings)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request):
+        """
+        Update current user settings
+        """
+        try:
+            settings = UserSettings.objects.get(member=request.user)
+        except UserSettings.DoesNotExist:
+            # Create default settings if they don't exist
+            settings = UserSettings.objects.create(member=request.user)
+        
+        serializer = UserSettingsSerializer(settings, data=request.data, partial=True)
+        
+        if not serializer.is_valid():
+            return Response(
+                {'error': str(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

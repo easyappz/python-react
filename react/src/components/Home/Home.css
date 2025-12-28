@@ -1,0 +1,222 @@
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+}
+
+.game-wrapper {
+  background: white;
+  border-radius: 30px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+}
+
+.game-title {
+  text-align: center;
+  font-size: 48px;
+  color: #ff6b6b;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 0 #ffd93d;
+  font-weight: bold;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.score-item {
+  flex: 1;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.score-item:hover {
+  transform: translateY(-5px);
+}
+
+.score-x {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.score-o {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.player-label {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.score-value {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.game-status {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  padding: 15px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #333;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.winner-status {
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
+  animation: celebrate 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes celebrate {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 20px;
+  font-size: 64px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cell:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cell:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.cell-x {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: #d63447;
+}
+
+.cell-o {
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  color: #1e3a8a;
+}
+
+.cell-content {
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.winning-cell {
+  animation: winPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes winPulse {
+  from {
+    transform: scale(1);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+  }
+  to {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.reset-button {
+  width: 100%;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+}
+
+.reset-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+.reset-button:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+  .game-wrapper {
+    padding: 20px;
+  }
+
+  .game-title {
+    font-size: 36px;
+  }
+
+  .cell {
+    font-size: 48px;
+  }
+
+  .game-status {
+    font-size: 22px;
+  }
+
+  .reset-button {
+    font-size: 20px;
+    padding: 15px;
+  }
+}

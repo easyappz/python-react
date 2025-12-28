@@ -1,6 +1,6 @@
 [
   {
-    "name": "Проверка главной страницы",
+    "name": "Загрузка главной страницы",
     "steps": [
       {
         "action": "navigate",
@@ -11,6 +11,483 @@
       {
         "type": "url",
         "expectedUrl": "{domain}"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='game-board']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='current-player']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='reset-button']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='score-x']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='score-o']"
+      }
+    ]
+  },
+  {
+    "name": "Клик по ячейкам и проверка появления X и O",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='cell-0']",
+        "expectedText": "X"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='cell-1']",
+        "expectedText": "O"
+      }
+    ]
+  },
+  {
+    "name": "Проверка победы по горизонтали",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-3']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-2']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='game-status']",
+        "expectedText": "🎉 Победил игрок X! 🎉"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='score-x']",
+        "expectedText": "1"
+      }
+    ]
+  },
+  {
+    "name": "Проверка победы по вертикали",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-3']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-6']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='game-status']",
+        "expectedText": "🎉 Победил игрок X! 🎉"
+      }
+    ]
+  },
+  {
+    "name": "Проверка победы по диагонали",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-2']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-8']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='game-status']",
+        "expectedText": "🎉 Победил игрок X! 🎉"
+      }
+    ]
+  },
+  {
+    "name": "Проверка ничьей",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-2']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-3']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-5']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-7']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-6']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-8']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='game-status']",
+        "expectedText": "🤝 Ничья! 🤝"
+      }
+    ]
+  },
+  {
+    "name": "Проверка кнопки сброса игры",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reset-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='cell-0']",
+        "expectedText": ""
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='cell-1']",
+        "expectedText": ""
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='current-player']",
+        "expectedText": "Ходит: X"
+      }
+    ]
+  },
+  {
+    "name": "Проверка счетчика побед",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-3']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-2']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reset-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-0']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-4']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-3']"
+      },
+      {
+        "action": "wait",
+        "delay": 200
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='cell-7']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": "[data-testid='score-x']",
+        "expectedText": "2"
+      },
+      {
+        "type": "text",
+        "selector": "[data-testid='score-o']",
+        "expectedText": "0"
       }
     ]
   }

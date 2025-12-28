@@ -8,27 +8,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='email-input']",
+        "selector": "[data-testid='register-email']",
         "value": "cardmodal@example.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='username-input']",
+        "selector": "[data-testid='register-username']",
         "value": "cardmodaluser"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-input']",
+        "selector": "[data-testid='register-password']",
         "value": "password123"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-confirm-input']",
+        "selector": "[data-testid='register-password-confirm']",
         "value": "password123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-button']"
+        "selector": "[data-testid='register-submit']"
       },
       {
         "action": "waitForRequests",
@@ -107,7 +107,7 @@
       },
       {
         "action": "click",
-        "selector": ".card-title"
+        "selector": "[data-testid='card-title']"
       },
       {
         "action": "wait",

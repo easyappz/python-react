@@ -8,27 +8,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='username-input']",
-        "value": "boarduser1"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='email-input']",
+        "selector": "[data-testid='register-email']",
         "value": "boarduser1@test.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-input']",
+        "selector": "[data-testid='register-username']",
+        "value": "boarduser1"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
         "value": "testpass123"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-confirm-input']",
+        "selector": "[data-testid='register-password-confirm']",
         "value": "testpass123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-button']"
+        "selector": "[data-testid='register-submit']"
       },
       {
         "action": "waitForRequests",
@@ -146,7 +146,7 @@
     "assertions": [
       {
         "type": "visibility",
-        "selector": ".card-title"
+        "selector": "[data-testid='card-title']"
       }
     ]
   }

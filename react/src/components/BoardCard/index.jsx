@@ -44,7 +44,7 @@ export const BoardCard = ({ board, onClick, onDelete, isOwner }) => {
       </div>
 
       <div className="board-card-content">
-        <h3 className="board-card-title">{board.title}</h3>
+        <h3 className="board-card-title" data-testid="board-card-title">{board.title}</h3>
         {board.description && (
           <p className="board-card-description">{board.description}</p>
         )}

@@ -1,15 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
+from django.db.models import Q
+from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema
+import csv
+import io
 from .serializers import (
     MessageSerializer,
     MemberSerializer,
     MemberRegistrationSerializer,
-    MemberLoginSerializer
+    MemberLoginSerializer,
+    TransactionSerializer
 )
-from .models import Member
+from .models import Member, Transaction, Category
 from .authentication import SessionAuthentication
 from .permissions import IsAuthenticated
 
@@ -177,3 +184,201 @@ class MeView(APIView):
     def get(self, request):
         serializer = MemberSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TransactionPagination(PageNumberPagination):
+    """
+    Pagination for transactions
+    """
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing transactions
+    """
+    serializer_class = TransactionSerializer
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = TransactionPagination
+
+    def get_queryset(self):
+        """
+        Get transactions for current user with filtering
+        """
+        queryset = Transaction.objects.filter(member=self.request.user)
+        
+        # Filter by type
+        transaction_type = self.request.query_params.get('type', None)
+        if transaction_type:
+            queryset = queryset.filter(type=transaction_type)
+        
+        # Filter by category
+        category_id = self.request.query_params.get('category_id', None)
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+        
+        # Filter by date range
+        date_from = self.request.query_params.get('date_from', None)
+        if date_from:
+            queryset = queryset.filter(date__gte=date_from)
+        
+        date_to = self.request.query_params.get('date_to', None)
+        if date_to:
+            queryset = queryset.filter(date__lte=date_to)
+        
+        # Filter by counterparty
+        counterparty = self.request.query_params.get('counterparty', None)
+        if counterparty:
+            queryset = queryset.filter(counterparty__icontains=counterparty)
+        
+        # Filter by project
+        project = self.request.query_params.get('project', None)
+        if project:
+            queryset = queryset.filter(project__icontains=project)
+        
+        # Filter by account
+        account = self.request.query_params.get('account', None)
+        if account:
+            queryset = queryset.filter(account__icontains=account)
+        
+        # Search in description, counterparty, project
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(
+                Q(description__icontains=search) |
+                Q(counterparty__icontains=search) |
+                Q(project__icontains=search)
+            )
+        
+        return queryset.select_related('category')
+
+    def perform_create(self, serializer):
+        """
+        Set member to current user on create
+        """
+        serializer.save(member=self.request.user)
+
+    def perform_update(self, serializer):
+        """
+        Ensure member stays the same on update
+        """
+        serializer.save(member=self.request.user)
+
+    @action(detail=False, methods=['get'], url_path='export')
+    def export(self, request):
+        """
+        Export transactions to CSV or Excel format
+        """
+        export_format = request.query_params.get('format', None)
+        
+        if not export_format:
+            return Response(
+                {'error': 'Format parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if export_format not in ['csv', 'excel']:
+            return Response(
+                {'error': 'Invalid format. Allowed: csv, excel'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get filtered queryset
+        queryset = self.get_queryset()
+        
+        if export_format == 'csv':
+            return self._export_csv(queryset)
+        else:
+            return self._export_excel(queryset)
+
+    def _export_csv(self, queryset):
+        """
+        Export transactions to CSV
+        """
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow([
+            'ID', 'Type', 'Amount', 'Date', 'Category', 'Description',
+            'Counterparty', 'Project', 'Account', 'Document', 'Created At'
+        ])
+        
+        # Write data
+        for transaction in queryset:
+            writer.writerow([
+                transaction.id,
+                transaction.type,
+                str(transaction.amount),
+                transaction.date.strftime('%Y-%m-%d'),
+                transaction.category.name,
+                transaction.description or '',
+                transaction.counterparty or '',
+                transaction.project or '',
+                transaction.account or '',
+                transaction.document or '',
+                transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        response = HttpResponse(output.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="transactions.csv"'
+        return response
+
+    def _export_excel(self, queryset):
+        """
+        Export transactions to Excel format
+        """
+        try:
+            import openpyxl
+            from openpyxl.styles import Font
+        except ImportError:
+            return Response(
+                {'error': 'Excel export is not available'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Transactions'
+        
+        # Write header
+        headers = [
+            'ID', 'Type', 'Amount', 'Date', 'Category', 'Description',
+            'Counterparty', 'Project', 'Account', 'Document', 'Created At'
+        ]
+        worksheet.append(headers)
+        
+        # Make header bold
+        for cell in worksheet[1]:
+            cell.font = Font(bold=True)
+        
+        # Write data
+        for transaction in queryset:
+            worksheet.append([
+                transaction.id,
+                transaction.type,
+                float(transaction.amount),
+                transaction.date.strftime('%Y-%m-%d'),
+                transaction.category.name,
+                transaction.description or '',
+                transaction.counterparty or '',
+                transaction.project or '',
+                transaction.account or '',
+                transaction.document or '',
+                transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        # Save to bytes
+        output = io.BytesIO()
+        workbook.save(output)
+        output.seek(0)
+        
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="transactions.xlsx"'
+        return response

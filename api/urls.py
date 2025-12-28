@@ -1,11 +1,16 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (
     HelloView,
     RegisterView,
     LoginView,
     LogoutView,
-    MeView
+    MeView,
+    TransactionViewSet
 )
+
+router = DefaultRouter()
+router.register(r'transactions', TransactionViewSet, basename='transaction')
 
 urlpatterns = [
     path("hello/", HelloView.as_view(), name="hello"),
@@ -15,4 +20,7 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="login"),
     path("auth/logout/", LogoutView.as_view(), name="logout"),
     path("auth/me/", MeView.as_view(), name="me"),
+    
+    # Include router URLs
+    path("", include(router.urls)),
 ]

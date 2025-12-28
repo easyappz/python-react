@@ -1,0 +1,59 @@
+openapi: 3.0.3
+info:
+  title: FinOps MVP API
+  description: API for FinOps web application for small business
+  version: 1.0.0
+servers:
+  - url: /api
+    description: API server
+paths:
+  /auth/register:
+    $ref: './paths/auth.yml#/register'
+  /auth/login:
+    $ref: './paths/auth.yml#/login'
+  /auth/logout:
+    $ref: './paths/auth.yml#/logout'
+  /auth/me:
+    $ref: './paths/auth.yml#/me'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+        - error
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Member ID
+        email:
+          type: string
+          format: email
+          description: Member email
+        name:
+          type: string
+          description: Member name
+        business_name:
+          type: string
+          description: Business name
+        created_at:
+          type: string
+          format: date-time
+          description: Registration date
+      required:
+        - id
+        - email
+        - name
+        - business_name
+        - created_at
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+      description: HttpOnly cookie authentication

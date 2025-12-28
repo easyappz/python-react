@@ -1,0 +1,163 @@
+register:
+  post:
+    summary: Register new member
+    description: Register new member and automatically login
+    tags:
+      - Authentication
+    x-isSecure: false
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: Member email
+              password:
+                type: string
+                format: password
+                minLength: 8
+                description: Member password
+              name:
+                type: string
+                description: Member name
+              business_name:
+                type: string
+                description: Business name
+            required:
+              - email
+              - password
+              - name
+              - business_name
+    responses:
+      '201':
+        description: Member successfully registered and logged in
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
+              example: sessionid=abc123; HttpOnly; Path=/; SameSite=Lax
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Member'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '409':
+        description: Member with this email already exists
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+login:
+  post:
+    summary: Login member
+    description: Authenticate member and set session cookie
+    tags:
+      - Authentication
+    x-isSecure: false
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: Member email
+              password:
+                type: string
+                format: password
+                description: Member password
+            required:
+              - email
+              - password
+    responses:
+      '200':
+        description: Member successfully logged in
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
+              example: sessionid=abc123; HttpOnly; Path=/; SameSite=Lax
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Member'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Invalid credentials
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+logout:
+  post:
+    summary: Logout member
+    description: Logout current member and clear session cookie
+    tags:
+      - Authentication
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Member successfully logged out
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
+              example: sessionid=; HttpOnly; Path=/; Max-Age=0
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Successfully logged out
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+me:
+  get:
+    summary: Get current member
+    description: Get information about currently authenticated member
+    tags:
+      - Authentication
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Current member information
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Member'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

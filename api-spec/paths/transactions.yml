@@ -1,0 +1,392 @@
+list:
+  get:
+    summary: Get list of transactions
+    description: Get list of transactions with filtering options
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: type
+        in: query
+        description: Transaction type filter
+        required: false
+        schema:
+          type: string
+          enum: [income, expense]
+      - name: category_id
+        in: query
+        description: Category ID filter
+        required: false
+        schema:
+          type: integer
+      - name: date_from
+        in: query
+        description: Date from filter
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: Date to filter
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: counterparty
+        in: query
+        description: Counterparty filter
+        required: false
+        schema:
+          type: string
+      - name: project
+        in: query
+        description: Project filter
+        required: false
+        schema:
+          type: string
+      - name: account
+        in: query
+        description: Account filter
+        required: false
+        schema:
+          type: string
+      - name: search
+        in: query
+        description: Search by description, counterparty, project
+        required: false
+        schema:
+          type: string
+    responses:
+      '200':
+        description: List of transactions
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../openapi.yml#/components/schemas/Transaction'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+create:
+  post:
+    summary: Create transaction
+    description: Create new transaction
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [income, expense]
+                description: Transaction type
+              amount:
+                type: number
+                format: decimal
+                description: Transaction amount
+              date:
+                type: string
+                format: date
+                description: Transaction date
+              category_id:
+                type: integer
+                description: Category ID
+              description:
+                type: string
+                description: Transaction description
+              counterparty:
+                type: string
+                description: Counterparty name
+              project:
+                type: string
+                description: Project name
+              account:
+                type: string
+                description: Account name
+              document:
+                type: string
+                description: Document reference
+            required:
+              - type
+              - amount
+              - date
+              - category_id
+    responses:
+      '201':
+        description: Transaction successfully created
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Transaction'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+detail:
+  get:
+    summary: Get transaction
+    description: Get transaction by ID
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: Transaction ID
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Transaction details
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Transaction'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: Transaction not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+update:
+  put:
+    summary: Update transaction
+    description: Update transaction by ID
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: Transaction ID
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [income, expense]
+                description: Transaction type
+              amount:
+                type: number
+                format: decimal
+                description: Transaction amount
+              date:
+                type: string
+                format: date
+                description: Transaction date
+              category_id:
+                type: integer
+                description: Category ID
+              description:
+                type: string
+                description: Transaction description
+              counterparty:
+                type: string
+                description: Counterparty name
+              project:
+                type: string
+                description: Project name
+              account:
+                type: string
+                description: Account name
+              document:
+                type: string
+                description: Document reference
+            required:
+              - type
+              - amount
+              - date
+              - category_id
+    responses:
+      '200':
+        description: Transaction successfully updated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Transaction'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: Transaction not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+delete:
+  delete:
+    summary: Delete transaction
+    description: Delete transaction by ID
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: Transaction ID
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Transaction successfully deleted
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: Transaction not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+export:
+  get:
+    summary: Export transactions
+    description: Export transactions to CSV or Excel format
+    tags:
+      - Transactions
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: format
+        in: query
+        description: Export format
+        required: true
+        schema:
+          type: string
+          enum: [csv, excel]
+      - name: type
+        in: query
+        description: Transaction type filter
+        required: false
+        schema:
+          type: string
+          enum: [income, expense]
+      - name: category_id
+        in: query
+        description: Category ID filter
+        required: false
+        schema:
+          type: integer
+      - name: date_from
+        in: query
+        description: Date from filter
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: Date to filter
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: counterparty
+        in: query
+        description: Counterparty filter
+        required: false
+        schema:
+          type: string
+      - name: project
+        in: query
+        description: Project filter
+        required: false
+        schema:
+          type: string
+      - name: account
+        in: query
+        description: Account filter
+        required: false
+        schema:
+          type: string
+      - name: search
+        in: query
+        description: Search by description, counterparty, project
+        required: false
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Exported transactions file
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+      '400':
+        description: Invalid format parameter
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

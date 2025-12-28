@@ -20,7 +20,7 @@ export const Card = ({ card, index, onEdit }) => {
           data-testid={`card-${card.id}`}
         >
           <div className="card-content">
-            <div className="card-title">{card.title}</div>
+            <div className="card-title" data-testid="card-title">{card.title}</div>
             {card.description && (
               <div className="card-description">{card.description}</div>
             )}

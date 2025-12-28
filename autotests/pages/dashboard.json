@@ -8,27 +8,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='username-input']",
-        "value": "dashuser1"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='email-input']",
+        "selector": "[data-testid='register-email']",
         "value": "dashuser1@example.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-input']",
+        "selector": "[data-testid='register-username']",
+        "value": "dashuser1"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='register-password']",
         "value": "TestPassword123"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='password-confirm-input']",
+        "selector": "[data-testid='register-password-confirm']",
         "value": "TestPassword123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-button']"
+        "selector": "[data-testid='register-submit']"
       },
       {
         "action": "waitForRequests",
@@ -83,7 +83,7 @@
       },
       {
         "type": "text",
-        "selector": ".board-card-title",
+        "selector": "[data-testid='board-card-title']",
         "expectedText": "Моя первая доска"
       }
     ]

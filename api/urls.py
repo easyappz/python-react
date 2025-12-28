@@ -8,7 +8,14 @@ from .views import (
     MeView,
     TransactionViewSet,
     CategoryViewSet,
-    UserSettingsViewSet
+    UserSettingsViewSet,
+    DashboardStatsView,
+    DashboardDynamicsView,
+    TopCategoriesView,
+    ProfitLossReportView,
+    CashFlowReportView,
+    TaxReportView,
+    ReportExportView
 )
 
 router = DefaultRouter()
@@ -26,6 +33,17 @@ urlpatterns = [
     
     # Settings endpoints
     path("settings/", UserSettingsViewSet.as_view({'get': 'retrieve', 'put': 'update'}), name="settings"),
+    
+    # Dashboard endpoints
+    path("dashboard/stats/", DashboardStatsView.as_view(), name="dashboard-stats"),
+    path("dashboard/dynamics/", DashboardDynamicsView.as_view(), name="dashboard-dynamics"),
+    path("dashboard/top-categories/", TopCategoriesView.as_view(), name="dashboard-top-categories"),
+    
+    # Reports endpoints
+    path("reports/profit-loss/", ProfitLossReportView.as_view(), name="reports-profit-loss"),
+    path("reports/cash-flow/", CashFlowReportView.as_view(), name="reports-cash-flow"),
+    path("reports/tax/", TaxReportView.as_view(), name="reports-tax"),
+    path("reports/export/", ReportExportView.as_view(), name="reports-export"),
     
     # Include router URLs
     path("", include(router.urls)),

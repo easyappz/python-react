@@ -4,9 +4,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Sum, Case, When, DecimalField, Value, F
+from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 import csv
 import io
 from .serializers import (
@@ -16,7 +20,13 @@ from .serializers import (
     MemberLoginSerializer,
     TransactionSerializer,
     CategorySerializer,
-    UserSettingsSerializer
+    UserSettingsSerializer,
+    DashboardStatsSerializer,
+    DashboardDynamicsSerializer,
+    TopCategoriesSerializer,
+    ProfitLossReportSerializer,
+    CashFlowReportSerializer,
+    TaxReportSerializer
 )
 from .models import Member, Transaction, Category, UserSettings
 from .authentication import SessionAuthentication
@@ -474,3 +484,779 @@ class UserSettingsViewSet(viewsets.ViewSet):
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PeriodMixin:
+    """
+    Mixin to handle period calculation
+    """
+    def get_date_range(self, request):
+        """
+        Calculate date range based on period parameter
+        """
+        period = request.query_params.get('period', 'current_month')
+        date_from_str = request.query_params.get('date_from')
+        date_to_str = request.query_params.get('date_to')
+        
+        today = date.today()
+        
+        if period == 'current_month':
+            date_from = today.replace(day=1)
+            next_month = date_from + relativedelta(months=1)
+            date_to = next_month - relativedelta(days=1)
+        elif period == 'last_month':
+            first_day_current = today.replace(day=1)
+            date_to = first_day_current - relativedelta(days=1)
+            date_from = date_to.replace(day=1)
+        elif period == 'current_year':
+            date_from = today.replace(month=1, day=1)
+            date_to = today.replace(month=12, day=31)
+        elif period == 'custom':
+            if not date_from_str or not date_to_str:
+                raise ValueError('date_from and date_to are required for custom period')
+            try:
+                date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+                date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+            except ValueError:
+                raise ValueError('Invalid date format. Use YYYY-MM-DD')
+        else:
+            raise ValueError('Invalid period parameter')
+        
+        return period, date_from, date_to
+
+
+class DashboardStatsView(APIView, PeriodMixin):
+    """
+    Get dashboard statistics
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: DashboardStatsSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get dashboard statistics"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get user settings for tax rate
+        try:
+            settings = UserSettings.objects.get(member=request.user)
+            tax_rate = settings.tax_rate
+        except UserSettings.DoesNotExist:
+            tax_rate = Decimal('0.00')
+        
+        # Calculate totals
+        transactions = Transaction.objects.filter(
+            member=request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        )
+        
+        total_income = transactions.filter(type='income').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        total_expenses = transactions.filter(type='expense').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        # Calculate taxes
+        taxable_income = total_income - total_expenses
+        taxes = (taxable_income * tax_rate / 100) if taxable_income > 0 else Decimal('0.00')
+        
+        # Calculate metrics
+        cash_flow = total_income - total_expenses
+        net_profit = cash_flow - taxes
+        profitability = (net_profit / total_income * 100) if total_income > 0 else Decimal('0.00')
+        
+        data = {
+            'total_income': total_income,
+            'total_expenses': total_expenses,
+            'net_profit': net_profit,
+            'taxes': taxes,
+            'cash_flow': cash_flow,
+            'profitability': profitability,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = DashboardStatsSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DashboardDynamicsView(APIView, PeriodMixin):
+    """
+    Get dynamics by months
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: DashboardDynamicsSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get dynamics by months"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get monthly aggregated data
+        transactions = Transaction.objects.filter(
+            member=request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        ).annotate(
+            month=TruncMonth('date')
+        ).values('month').annotate(
+            income=Coalesce(
+                Sum(Case(
+                    When(type='income', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            ),
+            expenses=Coalesce(
+                Sum(Case(
+                    When(type='expense', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            )
+        ).order_by('month')
+        
+        # Calculate profit for each month
+        dynamics = []
+        for item in transactions:
+            profit = item['income'] - item['expenses']
+            dynamics.append({
+                'month': item['month'],
+                'income': item['income'],
+                'expenses': item['expenses'],
+                'profit': profit
+            })
+        
+        data = {
+            'dynamics': dynamics,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = DashboardDynamicsSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TopCategoriesView(APIView, PeriodMixin):
+    """
+    Get top categories
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: TopCategoriesSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get top categories"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        limit = int(request.query_params.get('limit', 5))
+        
+        # Get top income categories
+        income_categories = Transaction.objects.filter(
+            member=request.user,
+            type='income',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values(
+            'category_id',
+            'category__name'
+        ).annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')[:limit]
+        
+        # Calculate total income for percentages
+        total_income = sum(item['amount'] for item in income_categories)
+        
+        income_data = []
+        for item in income_categories:
+            percentage = (item['amount'] / total_income * 100) if total_income > 0 else Decimal('0.00')
+            income_data.append({
+                'category_id': item['category_id'],
+                'category_name': item['category__name'],
+                'amount': item['amount'],
+                'percentage': percentage
+            })
+        
+        # Get top expense categories
+        expense_categories = Transaction.objects.filter(
+            member=request.user,
+            type='expense',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values(
+            'category_id',
+            'category__name'
+        ).annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')[:limit]
+        
+        # Calculate total expenses for percentages
+        total_expenses = sum(item['amount'] for item in expense_categories)
+        
+        expense_data = []
+        for item in expense_categories:
+            percentage = (item['amount'] / total_expenses * 100) if total_expenses > 0 else Decimal('0.00')
+            expense_data.append({
+                'category_id': item['category_id'],
+                'category_name': item['category__name'],
+                'amount': item['amount'],
+                'percentage': percentage
+            })
+        
+        data = {
+            'income_categories': income_data,
+            'expense_categories': expense_data,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = TopCategoriesSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProfitLossReportView(APIView, PeriodMixin):
+    """
+    Get profit and loss report
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: ProfitLossReportSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get profit and loss report"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get user settings for tax rate
+        try:
+            settings = UserSettings.objects.get(member=request.user)
+            tax_rate = settings.tax_rate
+        except UserSettings.DoesNotExist:
+            tax_rate = Decimal('0.00')
+        
+        # Get income by category
+        income_categories = Transaction.objects.filter(
+            member=request.user,
+            type='income',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values(
+            'category_id',
+            'category__name'
+        ).annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')
+        
+        total_income = sum(item['amount'] for item in income_categories)
+        
+        income_data = {
+            'total': total_income,
+            'categories': [
+                {
+                    'category_id': item['category_id'],
+                    'category_name': item['category__name'],
+                    'amount': item['amount']
+                }
+                for item in income_categories
+            ]
+        }
+        
+        # Get expenses by category
+        expense_categories = Transaction.objects.filter(
+            member=request.user,
+            type='expense',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values(
+            'category_id',
+            'category__name'
+        ).annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')
+        
+        total_expenses = sum(item['amount'] for item in expense_categories)
+        
+        expenses_data = {
+            'total': total_expenses,
+            'categories': [
+                {
+                    'category_id': item['category_id'],
+                    'category_name': item['category__name'],
+                    'amount': item['amount']
+                }
+                for item in expense_categories
+            ]
+        }
+        
+        # Calculate metrics
+        gross_profit = total_income - total_expenses
+        taxable_income = gross_profit
+        taxes = (taxable_income * tax_rate / 100) if taxable_income > 0 else Decimal('0.00')
+        net_profit = gross_profit - taxes
+        
+        data = {
+            'income': income_data,
+            'expenses': expenses_data,
+            'gross_profit': gross_profit,
+            'taxes': taxes,
+            'net_profit': net_profit,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = ProfitLossReportSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CashFlowReportView(APIView, PeriodMixin):
+    """
+    Get cash flow report
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: CashFlowReportSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get cash flow report"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get total cash flows
+        transactions = Transaction.objects.filter(
+            member=request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        )
+        
+        cash_inflows = transactions.filter(type='income').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        cash_outflows = transactions.filter(type='expense').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        net_cash_flow = cash_inflows - cash_outflows
+        
+        # Get monthly data
+        monthly_transactions = transactions.annotate(
+            month=TruncMonth('date')
+        ).values('month').annotate(
+            inflows=Coalesce(
+                Sum(Case(
+                    When(type='income', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            ),
+            outflows=Coalesce(
+                Sum(Case(
+                    When(type='expense', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            )
+        ).order_by('month')
+        
+        monthly_data = []
+        for item in monthly_transactions:
+            net_flow = item['inflows'] - item['outflows']
+            monthly_data.append({
+                'month': item['month'],
+                'inflows': item['inflows'],
+                'outflows': item['outflows'],
+                'net_flow': net_flow
+            })
+        
+        data = {
+            'cash_inflows': cash_inflows,
+            'cash_outflows': cash_outflows,
+            'net_cash_flow': net_cash_flow,
+            'monthly_data': monthly_data,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = CashFlowReportSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TaxReportView(APIView, PeriodMixin):
+    """
+    Get tax report
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={
+            200: TaxReportSerializer,
+            400: {'type': 'object', 'properties': {'error': {'type': 'string'}}},
+            401: {'type': 'object', 'properties': {'error': {'type': 'string'}}}
+        },
+        description="Get tax report"
+    )
+    def get(self, request):
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get user settings for tax rate
+        try:
+            settings = UserSettings.objects.get(member=request.user)
+            tax_rate = settings.tax_rate
+        except UserSettings.DoesNotExist:
+            tax_rate = Decimal('0.00')
+        
+        # Get totals
+        transactions = Transaction.objects.filter(
+            member=request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        )
+        
+        total_income = transactions.filter(type='income').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        total_expenses = transactions.filter(type='expense').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        taxable_income = total_income - total_expenses
+        estimated_tax = (taxable_income * tax_rate / 100) if taxable_income > 0 else Decimal('0.00')
+        
+        # Get monthly breakdown
+        monthly_transactions = transactions.annotate(
+            month=TruncMonth('date')
+        ).values('month').annotate(
+            income=Coalesce(
+                Sum(Case(
+                    When(type='income', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            ),
+            expenses=Coalesce(
+                Sum(Case(
+                    When(type='expense', then='amount'),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )),
+                Value(0),
+                output_field=DecimalField()
+            )
+        ).order_by('month')
+        
+        monthly_breakdown = []
+        for item in monthly_transactions:
+            monthly_taxable_income = item['income'] - item['expenses']
+            monthly_tax = (monthly_taxable_income * tax_rate / 100) if monthly_taxable_income > 0 else Decimal('0.00')
+            monthly_breakdown.append({
+                'month': item['month'],
+                'income': item['income'],
+                'expenses': item['expenses'],
+                'taxable_income': monthly_taxable_income,
+                'tax': monthly_tax
+            })
+        
+        data = {
+            'taxable_income': taxable_income,
+            'tax_rate': tax_rate,
+            'estimated_tax': estimated_tax,
+            'total_income': total_income,
+            'total_expenses': total_expenses,
+            'monthly_breakdown': monthly_breakdown,
+            'period': period,
+            'date_from': date_from,
+            'date_to': date_to
+        }
+        
+        serializer = TaxReportSerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ReportExportView(APIView, PeriodMixin):
+    """
+    Export report in PDF or Excel format
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        report_type = request.query_params.get('report_type')
+        export_format = request.query_params.get('format')
+        
+        if not report_type or not export_format:
+            return Response(
+                {'error': 'report_type and format parameters are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if report_type not in ['profit_loss', 'cash_flow', 'tax']:
+            return Response(
+                {'error': 'Invalid report_type. Allowed: profit_loss, cash_flow, tax'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if export_format not in ['pdf', 'excel']:
+            return Response(
+                {'error': 'Invalid format. Allowed: pdf, excel'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            period, date_from, date_to = self.get_date_range(request)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if export_format == 'excel':
+            return self._export_excel(report_type, period, date_from, date_to)
+        else:
+            return self._export_pdf(report_type, period, date_from, date_to)
+    
+    def _export_excel(self, report_type, period, date_from, date_to):
+        """
+        Export report to Excel
+        """
+        try:
+            import openpyxl
+            from openpyxl.styles import Font, Alignment
+        except ImportError:
+            return Response(
+                {'error': 'Excel export is not available'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        
+        if report_type == 'profit_loss':
+            worksheet.title = 'Profit & Loss'
+            self._write_profit_loss_excel(worksheet, date_from, date_to)
+        elif report_type == 'cash_flow':
+            worksheet.title = 'Cash Flow'
+            self._write_cash_flow_excel(worksheet, date_from, date_to)
+        elif report_type == 'tax':
+            worksheet.title = 'Tax Report'
+            self._write_tax_excel(worksheet, date_from, date_to)
+        
+        output = io.BytesIO()
+        workbook.save(output)
+        output.seek(0)
+        
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{report_type}_report.xlsx"'
+        return response
+    
+    def _write_profit_loss_excel(self, worksheet, date_from, date_to):
+        """
+        Write profit and loss data to Excel worksheet
+        """
+        from openpyxl.styles import Font
+        
+        worksheet.append(['Profit & Loss Report'])
+        worksheet.append([f'Period: {date_from} to {date_to}'])
+        worksheet.append([])
+        
+        # Get data
+        try:
+            settings = UserSettings.objects.get(member=self.request.user)
+            tax_rate = settings.tax_rate
+        except UserSettings.DoesNotExist:
+            tax_rate = Decimal('0.00')
+        
+        income_categories = Transaction.objects.filter(
+            member=self.request.user,
+            type='income',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values('category__name').annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')
+        
+        expense_categories = Transaction.objects.filter(
+            member=self.request.user,
+            type='expense',
+            date__gte=date_from,
+            date__lte=date_to
+        ).values('category__name').annotate(
+            amount=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        ).order_by('-amount')
+        
+        total_income = sum(item['amount'] for item in income_categories)
+        total_expenses = sum(item['amount'] for item in expense_categories)
+        gross_profit = total_income - total_expenses
+        taxes = (gross_profit * tax_rate / 100) if gross_profit > 0 else Decimal('0.00')
+        net_profit = gross_profit - taxes
+        
+        # Write income
+        worksheet.append(['Income'])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+        for item in income_categories:
+            worksheet.append([item['category__name'], float(item['amount'])])
+        worksheet.append(['Total Income', float(total_income)])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+        worksheet.append([])
+        
+        # Write expenses
+        worksheet.append(['Expenses'])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+        for item in expense_categories:
+            worksheet.append([item['category__name'], float(item['amount'])])
+        worksheet.append(['Total Expenses', float(total_expenses)])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+        worksheet.append([])
+        
+        # Write summary
+        worksheet.append(['Gross Profit', float(gross_profit)])
+        worksheet.append(['Taxes', float(taxes)])
+        worksheet.append(['Net Profit', float(net_profit)])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+    
+    def _write_cash_flow_excel(self, worksheet, date_from, date_to):
+        """
+        Write cash flow data to Excel worksheet
+        """
+        from openpyxl.styles import Font
+        
+        worksheet.append(['Cash Flow Report'])
+        worksheet.append([f'Period: {date_from} to {date_to}'])
+        worksheet.append([])
+        
+        # Get data
+        transactions = Transaction.objects.filter(
+            member=self.request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        )
+        
+        cash_inflows = transactions.filter(type='income').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        cash_outflows = transactions.filter(type='expense').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        net_cash_flow = cash_inflows - cash_outflows
+        
+        worksheet.append(['Cash Inflows', float(cash_inflows)])
+        worksheet.append(['Cash Outflows', float(cash_outflows)])
+        worksheet.append(['Net Cash Flow', float(net_cash_flow)])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+    
+    def _write_tax_excel(self, worksheet, date_from, date_to):
+        """
+        Write tax data to Excel worksheet
+        """
+        from openpyxl.styles import Font
+        
+        worksheet.append(['Tax Report'])
+        worksheet.append([f'Period: {date_from} to {date_to}'])
+        worksheet.append([])
+        
+        # Get data
+        try:
+            settings = UserSettings.objects.get(member=self.request.user)
+            tax_rate = settings.tax_rate
+        except UserSettings.DoesNotExist:
+            tax_rate = Decimal('0.00')
+        
+        transactions = Transaction.objects.filter(
+            member=self.request.user,
+            date__gte=date_from,
+            date__lte=date_to
+        )
+        
+        total_income = transactions.filter(type='income').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        total_expenses = transactions.filter(type='expense').aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        
+        taxable_income = total_income - total_expenses
+        estimated_tax = (taxable_income * tax_rate / 100) if taxable_income > 0 else Decimal('0.00')
+        
+        worksheet.append(['Total Income', float(total_income)])
+        worksheet.append(['Total Expenses', float(total_expenses)])
+        worksheet.append(['Taxable Income', float(taxable_income)])
+        worksheet.append(['Tax Rate', f'{float(tax_rate)}%'])
+        worksheet.append(['Estimated Tax', float(estimated_tax)])
+        worksheet['A' + str(worksheet.max_row)].font = Font(bold=True)
+    
+    def _export_pdf(self, report_type, period, date_from, date_to):
+        """
+        Export report to PDF
+        """
+        return Response(
+            {'error': 'PDF export is not implemented yet'},
+            status=status.HTTP_400_BAD_REQUEST
+        )

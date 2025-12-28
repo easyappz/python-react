@@ -145,3 +145,117 @@ class TransactionSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.Serializer):
     """Generic message serializer"""
     message = serializers.CharField(max_length=200)
+
+
+# Dashboard serializers
+class DashboardStatsSerializer(serializers.Serializer):
+    """Serializer for dashboard statistics"""
+    total_income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_expenses = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_profit = serializers.DecimalField(max_digits=15, decimal_places=2)
+    taxes = serializers.DecimalField(max_digits=15, decimal_places=2)
+    cash_flow = serializers.DecimalField(max_digits=15, decimal_places=2)
+    profitability = serializers.DecimalField(max_digits=15, decimal_places=2)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+
+class DynamicsItemSerializer(serializers.Serializer):
+    """Serializer for dynamics item"""
+    month = serializers.DateField()
+    income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    expenses = serializers.DecimalField(max_digits=15, decimal_places=2)
+    profit = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class DashboardDynamicsSerializer(serializers.Serializer):
+    """Serializer for dashboard dynamics"""
+    dynamics = DynamicsItemSerializer(many=True)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+
+class TopCategoryItemSerializer(serializers.Serializer):
+    """Serializer for top category item"""
+    category_id = serializers.IntegerField()
+    category_name = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    percentage = serializers.DecimalField(max_digits=5, decimal_places=2)
+
+
+class TopCategoriesSerializer(serializers.Serializer):
+    """Serializer for top categories"""
+    income_categories = TopCategoryItemSerializer(many=True)
+    expense_categories = TopCategoryItemSerializer(many=True)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+
+# Reports serializers
+class CategoryBreakdownSerializer(serializers.Serializer):
+    """Serializer for category breakdown"""
+    category_id = serializers.IntegerField()
+    category_name = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class IncomeExpensesSerializer(serializers.Serializer):
+    """Serializer for income/expenses breakdown"""
+    total = serializers.DecimalField(max_digits=15, decimal_places=2)
+    categories = CategoryBreakdownSerializer(many=True)
+
+
+class ProfitLossReportSerializer(serializers.Serializer):
+    """Serializer for profit and loss report"""
+    income = IncomeExpensesSerializer()
+    expenses = IncomeExpensesSerializer()
+    gross_profit = serializers.DecimalField(max_digits=15, decimal_places=2)
+    taxes = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_profit = serializers.DecimalField(max_digits=15, decimal_places=2)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+
+class CashFlowMonthlyDataSerializer(serializers.Serializer):
+    """Serializer for cash flow monthly data"""
+    month = serializers.DateField()
+    inflows = serializers.DecimalField(max_digits=15, decimal_places=2)
+    outflows = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_flow = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class CashFlowReportSerializer(serializers.Serializer):
+    """Serializer for cash flow report"""
+    cash_inflows = serializers.DecimalField(max_digits=15, decimal_places=2)
+    cash_outflows = serializers.DecimalField(max_digits=15, decimal_places=2)
+    net_cash_flow = serializers.DecimalField(max_digits=15, decimal_places=2)
+    monthly_data = CashFlowMonthlyDataSerializer(many=True)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+
+class TaxMonthlyBreakdownSerializer(serializers.Serializer):
+    """Serializer for tax monthly breakdown"""
+    month = serializers.DateField()
+    income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    expenses = serializers.DecimalField(max_digits=15, decimal_places=2)
+    taxable_income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    tax = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class TaxReportSerializer(serializers.Serializer):
+    """Serializer for tax report"""
+    taxable_income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    tax_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
+    estimated_tax = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_income = serializers.DecimalField(max_digits=15, decimal_places=2)
+    total_expenses = serializers.DecimalField(max_digits=15, decimal_places=2)
+    monthly_breakdown = TaxMonthlyBreakdownSerializer(many=True)
+    period = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()

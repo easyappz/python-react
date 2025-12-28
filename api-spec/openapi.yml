@@ -39,6 +39,20 @@ paths:
     $ref: './paths/settings.yml#/get'
   /settings/:
     $ref: './paths/settings.yml#/update'
+  /dashboard/stats:
+    $ref: './paths/dashboard.yml#/stats'
+  /dashboard/dynamics:
+    $ref: './paths/dashboard.yml#/dynamics'
+  /dashboard/top-categories:
+    $ref: './paths/dashboard.yml#/top_categories'
+  /reports/profit-loss:
+    $ref: './paths/reports.yml#/profit_loss'
+  /reports/cash-flow:
+    $ref: './paths/reports.yml#/cash_flow'
+  /reports/tax:
+    $ref: './paths/reports.yml#/tax'
+  /reports/export:
+    $ref: './paths/reports.yml#/export'
 components:
   schemas:
     Error:

@@ -1,0 +1,317 @@
+stats:
+  get:
+    summary: Get dashboard statistics
+    description: Get statistics for dashboard including total income, expenses, profit, taxes, cash flow, and profitability
+    tags:
+      - Dashboard
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for statistics
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Dashboard statistics
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                total_income:
+                  type: number
+                  format: decimal
+                  description: Total income for the period
+                total_expenses:
+                  type: number
+                  format: decimal
+                  description: Total expenses for the period
+                net_profit:
+                  type: number
+                  format: decimal
+                  description: Net profit (income - expenses - taxes)
+                taxes:
+                  type: number
+                  format: decimal
+                  description: Estimated taxes for the period
+                cash_flow:
+                  type: number
+                  format: decimal
+                  description: Cash flow (income - expenses)
+                profitability:
+                  type: number
+                  format: decimal
+                  description: Profitability percentage
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - total_income
+                - total_expenses
+                - net_profit
+                - taxes
+                - cash_flow
+                - profitability
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true
+
+dynamics:
+  get:
+    summary: Get dynamics by months
+    description: Get dynamics of income, expenses, and profit by months for the period
+    tags:
+      - Dashboard
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for dynamics
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_year
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Dynamics data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dynamics:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      month:
+                        type: string
+                        format: date
+                        description: Month (YYYY-MM-01 format)
+                      income:
+                        type: number
+                        format: decimal
+                        description: Total income for the month
+                      expenses:
+                        type: number
+                        format: decimal
+                        description: Total expenses for the month
+                      profit:
+                        type: number
+                        format: decimal
+                        description: Profit for the month
+                    required:
+                      - month
+                      - income
+                      - expenses
+                      - profit
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - dynamics
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true
+
+top_categories:
+  get:
+    summary: Get top categories
+    description: Get top categories for income and expenses by amount
+    tags:
+      - Dashboard
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for top categories
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: Number of top categories to return
+        required: false
+        schema:
+          type: integer
+          default: 5
+    responses:
+      '200':
+        description: Top categories
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                income_categories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      category_id:
+                        type: integer
+                        description: Category ID
+                      category_name:
+                        type: string
+                        description: Category name
+                      amount:
+                        type: number
+                        format: decimal
+                        description: Total amount for the category
+                      percentage:
+                        type: number
+                        format: decimal
+                        description: Percentage of total income
+                    required:
+                      - category_id
+                      - category_name
+                      - amount
+                      - percentage
+                expense_categories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      category_id:
+                        type: integer
+                        description: Category ID
+                      category_name:
+                        type: string
+                        description: Category name
+                      amount:
+                        type: number
+                        format: decimal
+                        description: Total amount for the category
+                      percentage:
+                        type: number
+                        format: decimal
+                        description: Percentage of total expenses
+                    required:
+                      - category_id
+                      - category_name
+                      - amount
+                      - percentage
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - income_categories
+                - expense_categories
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true

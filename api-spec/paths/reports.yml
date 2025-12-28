@@ -1,0 +1,448 @@
+profit_loss:
+  get:
+    summary: Get profit and loss report
+    description: Get detailed profit and loss report for the period
+    tags:
+      - Reports
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for report
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Profit and loss report
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                income:
+                  type: object
+                  properties:
+                    total:
+                      type: number
+                      format: decimal
+                      description: Total income
+                    categories:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          category_id:
+                            type: integer
+                            description: Category ID
+                          category_name:
+                            type: string
+                            description: Category name
+                          amount:
+                            type: number
+                            format: decimal
+                            description: Amount for the category
+                        required:
+                          - category_id
+                          - category_name
+                          - amount
+                  required:
+                    - total
+                    - categories
+                expenses:
+                  type: object
+                  properties:
+                    total:
+                      type: number
+                      format: decimal
+                      description: Total expenses
+                    categories:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          category_id:
+                            type: integer
+                            description: Category ID
+                          category_name:
+                            type: string
+                            description: Category name
+                          amount:
+                            type: number
+                            format: decimal
+                            description: Amount for the category
+                        required:
+                          - category_id
+                          - category_name
+                          - amount
+                  required:
+                    - total
+                    - categories
+                gross_profit:
+                  type: number
+                  format: decimal
+                  description: Gross profit (income - expenses)
+                taxes:
+                  type: number
+                  format: decimal
+                  description: Estimated taxes
+                net_profit:
+                  type: number
+                  format: decimal
+                  description: Net profit (gross profit - taxes)
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - income
+                - expenses
+                - gross_profit
+                - taxes
+                - net_profit
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true
+
+cash_flow:
+  get:
+    summary: Get cash flow report
+    description: Get detailed cash flow report for the period
+    tags:
+      - Reports
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for report
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Cash flow report
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cash_inflows:
+                  type: number
+                  format: decimal
+                  description: Total cash inflows
+                cash_outflows:
+                  type: number
+                  format: decimal
+                  description: Total cash outflows
+                net_cash_flow:
+                  type: number
+                  format: decimal
+                  description: Net cash flow (inflows - outflows)
+                monthly_data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      month:
+                        type: string
+                        format: date
+                        description: Month (YYYY-MM-01 format)
+                      inflows:
+                        type: number
+                        format: decimal
+                        description: Cash inflows for the month
+                      outflows:
+                        type: number
+                        format: decimal
+                        description: Cash outflows for the month
+                      net_flow:
+                        type: number
+                        format: decimal
+                        description: Net cash flow for the month
+                    required:
+                      - month
+                      - inflows
+                      - outflows
+                      - net_flow
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - cash_inflows
+                - cash_outflows
+                - net_cash_flow
+                - monthly_data
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true
+
+tax:
+  get:
+    summary: Get tax report
+    description: Get detailed tax report for the period
+    tags:
+      - Reports
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: period
+        in: query
+        description: Period for report
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Tax report
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taxable_income:
+                  type: number
+                  format: decimal
+                  description: Taxable income (income - expenses)
+                tax_rate:
+                  type: number
+                  format: decimal
+                  description: Tax rate in percentage
+                estimated_tax:
+                  type: number
+                  format: decimal
+                  description: Estimated tax amount
+                total_income:
+                  type: number
+                  format: decimal
+                  description: Total income for the period
+                total_expenses:
+                  type: number
+                  format: decimal
+                  description: Total expenses for the period
+                monthly_breakdown:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      month:
+                        type: string
+                        format: date
+                        description: Month (YYYY-MM-01 format)
+                      income:
+                        type: number
+                        format: decimal
+                        description: Income for the month
+                      expenses:
+                        type: number
+                        format: decimal
+                        description: Expenses for the month
+                      taxable_income:
+                        type: number
+                        format: decimal
+                        description: Taxable income for the month
+                      tax:
+                        type: number
+                        format: decimal
+                        description: Tax for the month
+                    required:
+                      - month
+                      - income
+                      - expenses
+                      - taxable_income
+                      - tax
+                period:
+                  type: string
+                  description: Period type used
+                date_from:
+                  type: string
+                  format: date
+                  description: Start date of the period
+                date_to:
+                  type: string
+                  format: date
+                  description: End date of the period
+              required:
+                - taxable_income
+                - tax_rate
+                - estimated_tax
+                - total_income
+                - total_expenses
+                - monthly_breakdown
+                - period
+                - date_from
+                - date_to
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true
+
+export:
+  get:
+    summary: Export report
+    description: Export report in PDF or Excel format
+    tags:
+      - Reports
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: report_type
+        in: query
+        description: Type of report to export
+        required: true
+        schema:
+          type: string
+          enum: [profit_loss, cash_flow, tax]
+      - name: format
+        in: query
+        description: Export format
+        required: true
+        schema:
+          type: string
+          enum: [pdf, excel]
+      - name: period
+        in: query
+        description: Period for report
+        required: false
+        schema:
+          type: string
+          enum: [current_month, last_month, current_year, custom]
+          default: current_month
+      - name: date_from
+        in: query
+        description: Start date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: End date for custom period (required if period is custom)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Exported report file
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+    x-isSecure: true

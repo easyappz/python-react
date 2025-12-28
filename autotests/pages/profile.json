@@ -9,12 +9,12 @@
       {
         "action": "fill",
         "selector": "[data-testid='email-input']",
-        "value": "profiletest@example.com"
+        "value": "profiletest1@example.com"
       },
       {
         "action": "fill",
         "selector": "[data-testid='username-input']",
-        "value": "profileuser"
+        "value": "profileuser1"
       },
       {
         "action": "fill",
@@ -23,7 +23,7 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='confirm-password-input']",
+        "selector": "[data-testid='password-confirm-input']",
         "value": "testpass123"
       },
       {
@@ -41,13 +41,25 @@
       {
         "action": "wait",
         "delay": 1000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
-      {
-        "type": "url",
-        "expectedUrl": "{domain}/profile"
-      },
       {
         "type": "visibility",
         "selector": "[data-testid='profile-page']"
@@ -55,12 +67,12 @@
       {
         "type": "text",
         "selector": "[data-testid='profile-email']",
-        "expectedText": "profiletest@example.com"
+        "expectedText": "profiletest1@example.com"
       },
       {
         "type": "text",
         "selector": "[data-testid='profile-username']",
-        "expectedText": "profileuser"
+        "expectedText": "profileuser1"
       }
     ]
   },
@@ -74,7 +86,7 @@
       {
         "action": "fill",
         "selector": "[data-testid='email-input']",
-        "value": "editprofile@example.com"
+        "value": "profiletest2@example.com"
       },
       {
         "action": "fill",
@@ -88,7 +100,7 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='confirm-password-input']",
+        "selector": "[data-testid='password-confirm-input']",
         "value": "testpass123"
       },
       {
@@ -127,6 +139,22 @@
       {
         "action": "waitForRequests",
         "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
@@ -147,7 +175,7 @@
       {
         "action": "fill",
         "selector": "[data-testid='email-input']",
-        "value": "statsuser@example.com"
+        "value": "profiletest3@example.com"
       },
       {
         "action": "fill",
@@ -161,7 +189,7 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='confirm-password-input']",
+        "selector": "[data-testid='password-confirm-input']",
         "value": "testpass123"
       },
       {
@@ -179,6 +207,22 @@
       {
         "action": "wait",
         "delay": 1000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [

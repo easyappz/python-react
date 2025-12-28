@@ -9,12 +9,12 @@
       {
         "action": "fill",
         "selector": "[data-testid='username-input']",
-        "value": "testuser"
+        "value": "dashuser1"
       },
       {
         "action": "fill",
         "selector": "[data-testid='email-input']",
-        "value": "testuser@example.com"
+        "value": "dashuser1@example.com"
       },
       {
         "action": "fill",
@@ -49,28 +49,6 @@
   {
     "name": "Создание новой доски",
     "steps": [
-      {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='username-input']",
-        "value": "testuser"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='password-input']",
-        "value": "TestPassword123"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='login-button']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
       {
         "action": "click",
         "selector": "[data-testid='create-board-button']"
@@ -114,14 +92,6 @@
     "name": "Поиск досок",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/"
-      },
-      {
-        "action": "wait",
-        "delay": 1000
-      },
-      {
         "action": "fill",
         "selector": "[data-testid='search-boards-input']",
         "value": "Моя первая"
@@ -129,6 +99,14 @@
       {
         "action": "wait",
         "delay": 500
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [

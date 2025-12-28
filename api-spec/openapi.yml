@@ -27,6 +27,18 @@ paths:
     $ref: './paths/transactions.yml#/delete'
   /transactions/export:
     $ref: './paths/transactions.yml#/export'
+  /categories:
+    $ref: './paths/categories.yml#/list'
+  /categories/:
+    $ref: './paths/categories.yml#/create'
+  /categories/{id}:
+    $ref: './paths/categories.yml#/update'
+  /categories/{id}/delete:
+    $ref: './paths/categories.yml#/delete'
+  /settings:
+    $ref: './paths/settings.yml#/get'
+  /settings/:
+    $ref: './paths/settings.yml#/update'
 components:
   schemas:
     Error:
@@ -116,6 +128,87 @@ components:
         - amount
         - date
         - category_id
+        - user_id
+        - created_at
+        - updated_at
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Category ID
+        name:
+          type: string
+          description: Category name
+        type:
+          type: string
+          enum: [income, expense]
+          description: Category type
+        color:
+          type: string
+          description: Category color in hex format
+        icon:
+          type: string
+          description: Category icon name
+        is_default:
+          type: boolean
+          description: Is this a default category
+        user_id:
+          type: integer
+          description: User ID who created the category
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+        - id
+        - name
+        - type
+        - is_default
+        - user_id
+        - created_at
+        - updated_at
+    Settings:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Settings ID
+        tax_rate:
+          type: number
+          format: decimal
+          description: Tax rate in percentage
+        currency:
+          type: string
+          description: Currency code (ISO 4217)
+        language:
+          type: string
+          description: Language code (ISO 639-1)
+        default_period:
+          type: string
+          enum: [day, week, month, quarter, year]
+          description: Default period for reports
+        user_id:
+          type: integer
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+        - id
+        - tax_rate
+        - currency
+        - language
+        - default_period
         - user_id
         - created_at
         - updated_at

@@ -1,0 +1,76 @@
+get:
+  get:
+    summary: Get user settings
+    description: Get current user settings
+    tags:
+      - Settings
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: User settings
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Settings'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+update:
+  put:
+    summary: Update user settings
+    description: Update current user settings
+    tags:
+      - Settings
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tax_rate:
+                type: number
+                format: decimal
+                description: Tax rate in percentage
+                minimum: 0
+                maximum: 100
+              currency:
+                type: string
+                description: Currency code (ISO 4217)
+                example: USD
+              language:
+                type: string
+                description: Language code (ISO 639-1)
+                example: en
+              default_period:
+                type: string
+                enum: [day, week, month, quarter, year]
+                description: Default period for reports
+    responses:
+      '200':
+        description: Settings successfully updated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Settings'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

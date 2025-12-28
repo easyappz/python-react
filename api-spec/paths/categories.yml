@@ -1,0 +1,188 @@
+list:
+  get:
+    summary: Get list of categories
+    description: Get list of categories with filtering by type
+    tags:
+      - Categories
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: type
+        in: query
+        description: Category type filter
+        required: false
+        schema:
+          type: string
+          enum: [income, expense]
+    responses:
+      '200':
+        description: List of categories
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../openapi.yml#/components/schemas/Category'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+create:
+  post:
+    summary: Create category
+    description: Create new category
+    tags:
+      - Categories
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Category name
+              type:
+                type: string
+                enum: [income, expense]
+                description: Category type
+              color:
+                type: string
+                description: Category color in hex format
+              icon:
+                type: string
+                description: Category icon name
+              is_default:
+                type: boolean
+                description: Is this a default category
+                default: false
+            required:
+              - name
+              - type
+    responses:
+      '201':
+        description: Category successfully created
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Category'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+update:
+  put:
+    summary: Update category
+    description: Update category by ID
+    tags:
+      - Categories
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: Category ID
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Category name
+              type:
+                type: string
+                enum: [income, expense]
+                description: Category type
+              color:
+                type: string
+                description: Category color in hex format
+              icon:
+                type: string
+                description: Category icon name
+              is_default:
+                type: boolean
+                description: Is this a default category
+            required:
+              - name
+              - type
+    responses:
+      '200':
+        description: Category successfully updated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Category'
+      '400':
+        description: Invalid input data
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+delete:
+  delete:
+    summary: Delete category
+    description: Delete category by ID
+    tags:
+      - Categories
+    x-isSecure: true
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: Category ID
+        required: true
+        schema:
+          type: integer
+    responses:
+      '204':
+        description: Category successfully deleted
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

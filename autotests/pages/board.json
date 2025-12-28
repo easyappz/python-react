@@ -8,27 +8,27 @@
       },
       {
         "action": "fill",
-        "selector": "[data-testid='register-username']",
-        "value": "testuser_board"
+        "selector": "[data-testid='username-input']",
+        "value": "boarduser1"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='register-email']",
-        "value": "testboard@test.com"
+        "selector": "[data-testid='email-input']",
+        "value": "boarduser1@test.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='register-password']",
+        "selector": "[data-testid='password-input']",
         "value": "testpass123"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='register-password2']",
+        "selector": "[data-testid='password-confirm-input']",
         "value": "testpass123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='register-submit']"
+        "selector": "[data-testid='register-button']"
       },
       {
         "action": "waitForRequests",
@@ -36,7 +36,11 @@
       },
       {
         "action": "click",
-        "selector": "[data-testid='create-board-btn']"
+        "selector": "[data-testid='create-board-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
       },
       {
         "action": "fill",
@@ -45,7 +49,7 @@
       },
       {
         "action": "click",
-        "selector": "[data-testid='board-submit-btn']"
+        "selector": "[data-testid='submit-board-button']"
       },
       {
         "action": "waitForRequests",
@@ -53,7 +57,7 @@
       },
       {
         "action": "click",
-        "selector": "[data-testid='board-card']"
+        "selector": ".board-card"
       },
       {
         "action": "waitForRequests",
@@ -62,6 +66,10 @@
       {
         "action": "click",
         "selector": "[data-testid='add-column-trigger']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
       },
       {
         "action": "fill",
@@ -93,38 +101,12 @@
     "name": "Добавление карточки в колонку",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-username']",
-        "value": "testuser_board"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "testpass123"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='board-card']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
         "action": "click",
         "selector": "[data-testid='add-card-trigger']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
       },
       {
         "action": "fill",
@@ -143,6 +125,22 @@
       {
         "action": "waitForRequests",
         "timeout": 3000
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [

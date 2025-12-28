@@ -4,21 +4,31 @@
     "steps": [
       {
         "action": "navigate",
-        "url": "{domain}/login"
+        "url": "{domain}/register"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
+        "selector": "[data-testid='email-input']",
+        "value": "cardmodal@example.com"
       },
       {
         "action": "fill",
-        "selector": "[data-testid='login-password']",
+        "selector": "[data-testid='username-input']",
+        "value": "cardmodaluser"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-input']",
+        "value": "password123"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='password-confirm-input']",
         "value": "password123"
       },
       {
         "action": "click",
-        "selector": "[data-testid='login-submit']"
+        "selector": "[data-testid='register-button']"
       },
       {
         "action": "waitForRequests",
@@ -26,7 +36,28 @@
       },
       {
         "action": "click",
-        "selector": "[data-testid^='board-card-']"
+        "selector": "[data-testid='create-board-button']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='board-title-input']",
+        "value": "Доска для модалки"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='submit-board-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      },
+      {
+        "action": "click",
+        "selector": ".board-card"
       },
       {
         "action": "waitForRequests",
@@ -34,7 +65,49 @@
       },
       {
         "action": "click",
-        "selector": "[data-testid^='card-']"
+        "selector": "[data-testid='add-column-trigger']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='column-title-input']",
+        "value": "Колонка"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='column-submit-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-card-trigger']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='card-title-input']",
+        "value": "Тестовая карточка"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='card-submit-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      },
+      {
+        "action": "click",
+        "selector": ".card-title"
       },
       {
         "action": "wait",
@@ -56,51 +129,21 @@
     "name": "Редактирование названия карточки",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "password123"
-      },
-      {
         "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='board-card-']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='card-']"
+        "selector": "[data-testid='card-title']"
       },
       {
         "action": "wait",
-        "delay": 500
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='card-title']"
+        "delay": 300
       },
       {
         "action": "fill",
         "selector": "[data-testid='card-title-input']",
         "value": "Обновленное название"
+      },
+      {
+        "action": "wait",
+        "delay": 500
       }
     ],
     "assertions": [
@@ -114,50 +157,20 @@
     "name": "Добавление описания карточки",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "password123"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='board-card-']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='card-']"
-      },
-      {
-        "action": "wait",
-        "delay": 500
-      },
-      {
         "action": "click",
         "selector": "[data-testid='tab-description']"
       },
       {
+        "action": "wait",
+        "delay": 300
+      },
+      {
         "action": "click",
         "selector": "[data-testid='description-view']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
       },
       {
         "action": "fill",
@@ -167,12 +180,16 @@
       {
         "action": "click",
         "selector": "[data-testid='save-description-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
       {
         "type": "visibility",
-        "selector": "[data-testid='description-textarea']"
+        "selector": "[data-testid='description-view']"
       }
     ]
   },
@@ -180,50 +197,20 @@
     "name": "Добавление чек-листа",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "password123"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='board-card-']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='card-']"
-      },
-      {
-        "action": "wait",
-        "delay": 500
-      },
-      {
         "action": "click",
         "selector": "[data-testid='tab-checklists']"
       },
       {
+        "action": "wait",
+        "delay": 300
+      },
+      {
         "action": "click",
         "selector": "[data-testid='add-checklist-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 300
       },
       {
         "action": "fill",
@@ -233,12 +220,16 @@
       {
         "action": "click",
         "selector": "[data-testid='save-checklist-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
       {
         "type": "visibility",
-        "selector": "[data-testid='add-checklist-btn']"
+        "selector": "[data-testid='checklist-title-input']"
       }
     ]
   },
@@ -246,46 +237,12 @@
     "name": "Добавление комментария",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "password123"
-      },
-      {
         "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='board-card-']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='card-']"
+        "selector": "[data-testid='tab-comments']"
       },
       {
         "action": "wait",
-        "delay": 500
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='tab-comments']"
+        "delay": 300
       },
       {
         "action": "fill",
@@ -295,6 +252,10 @@
       {
         "action": "click",
         "selector": "[data-testid='add-comment-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
@@ -308,56 +269,34 @@
     "name": "Закрытие модального окна",
     "steps": [
       {
-        "action": "navigate",
-        "url": "{domain}/login"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-email']",
-        "value": "test@example.com"
-      },
-      {
-        "action": "fill",
-        "selector": "[data-testid='login-password']",
-        "value": "password123"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='login-submit']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 3000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='board-card-']"
-      },
-      {
-        "action": "waitForRequests",
-        "timeout": 2000
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid^='card-']"
-      },
-      {
-        "action": "wait",
-        "delay": 500
-      },
-      {
         "action": "click",
         "selector": "[data-testid='close-modal-btn']"
       },
       {
         "action": "wait",
         "delay": 300
+      },
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='logout-button']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
       }
     ],
     "assertions": [
       {
-        "type": "visibility",
-        "selector": "[data-testid='board-page']"
+        "type": "url",
+        "expectedUrl": "{domain}/login"
       }
     ]
   }

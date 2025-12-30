@@ -1,0 +1,96 @@
+[
+  {
+    "name": "Проверка отображения всех карточек метрик",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-income-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-expenses-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-profit-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-taxes-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-cashflow-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-profitability-card']"
+      }
+    ]
+  },
+  {
+    "name": "Проверка фильтра периода",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='dashboard-period-select']",
+        "value": "current_year"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 5000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-income-card']"
+      }
+    ]
+  },
+  {
+    "name": "Проверка отображения графиков",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "wait",
+        "delay": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-dynamics-chart']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-top-expenses']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-top-income']"
+      }
+    ]
+  }
+]

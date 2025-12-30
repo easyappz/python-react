@@ -198,15 +198,6 @@ class MeView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class TransactionPagination(PageNumberPagination):
-    """
-    Pagination for transactions
-    """
-    page_size = 50
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
-
 class TransactionViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing transactions
@@ -214,7 +205,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    pagination_class = TransactionPagination
+    pagination_class = None
 
     def get_queryset(self):
         """
@@ -265,7 +256,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 Q(project__icontains=search)
             )
         
-        return queryset.select_related('category')
+        return queryset.select_related('category').order_by('-date', '-created_at')
 
     def perform_create(self, serializer):
         """

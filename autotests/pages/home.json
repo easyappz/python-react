@@ -1,5 +1,21 @@
 [
   {
+    "name": "Проверка заголовка игры",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}"
+      }
+    ],
+    "assertions": [
+      {
+        "type": "text",
+        "selector": ".game-title",
+        "expectedText": "Крестики vs Нолики"
+      }
+    ]
+  },
+  {
     "name": "Загрузка главной страницы",
     "steps": [
       {

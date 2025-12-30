@@ -11,7 +11,7 @@
       {
         "type": "text",
         "selector": ".game-title",
-        "expectedText": "Крестики vs Нолики"
+        "expectedText": "Крестики + Нолики"
       }
     ]
   },

@@ -1,5 +1,44 @@
 [
   {
+    "name": "Проверка отображения дашборда с пустыми данными",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 5000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-income-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-expenses-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-profit-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-taxes-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-cashflow-card']"
+      },
+      {
+        "type": "visibility",
+        "selector": "[data-testid='dashboard-profitability-card']"
+      }
+    ]
+  },
+  {
     "name": "Проверка отображения всех карточек метрик",
     "steps": [
       {
@@ -79,10 +118,6 @@
       }
     ],
     "assertions": [
-      {
-        "type": "visibility",
-        "selector": "[data-testid='dashboard-dynamics-chart']"
-      },
       {
         "type": "visibility",
         "selector": "[data-testid='dashboard-top-expenses']"

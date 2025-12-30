@@ -30,16 +30,28 @@ const Dashboard = () => {
       setStats(statsData);
 
       const dynamicsData = await getDynamics(period === 'current_month' || period === 'last_month' ? 'current_year' : period, dateFrom, dateTo);
-      setDynamics(dynamicsData.dynamics || []);
+      // Ensure dynamics is always an array
+      if (dynamicsData && Array.isArray(dynamicsData.dynamics)) {
+        setDynamics(dynamicsData.dynamics);
+      } else {
+        setDynamics([]);
+      }
 
       const topCategoriesData = await getTopCategories(period, dateFrom, dateTo, 5);
-      setTopCategories(topCategoriesData);
+      // Ensure categories are always arrays
+      setTopCategories({
+        income_categories: Array.isArray(topCategoriesData?.income_categories) ? topCategoriesData.income_categories : [],
+        expense_categories: Array.isArray(topCategoriesData?.expense_categories) ? topCategoriesData.expense_categories : []
+      });
 
       setLoading(false);
     } catch (err) {
       setError('Ошибка загрузки данных');
       setLoading(false);
       console.error('Dashboard data loading error:', err);
+      // Set default values on error
+      setDynamics([]);
+      setTopCategories({ income_categories: [], expense_categories: [] });
     }
   };
 
@@ -180,7 +192,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {dynamics.length > 0 && (
+      {Array.isArray(dynamics) && dynamics.length > 0 && (
         <div className="chart-section" data-testid="dashboard-dynamics-chart">
           <h2>Динамика по месяцам</h2>
           <ResponsiveContainer width="100%" height={400}>
@@ -207,7 +219,7 @@ const Dashboard = () => {
       <div className="categories-section">
         <div className="category-chart" data-testid="dashboard-top-expenses">
           <h2>Топ-5 категорий расходов</h2>
-          {topCategories.expense_categories.length > 0 ? (
+          {Array.isArray(topCategories.expense_categories) && topCategories.expense_categories.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -233,7 +245,7 @@ const Dashboard = () => {
 
         <div className="category-chart" data-testid="dashboard-top-income">
           <h2>Топ-5 категорий доходов</h2>
-          {topCategories.income_categories.length > 0 ? (
+          {Array.isArray(topCategories.income_categories) && topCategories.income_categories.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie

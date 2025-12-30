@@ -1,100 +1,117 @@
 .dashboard-container {
-  padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #f5f7fa;
-  min-height: 100vh;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 15px;
 }
 
 .dashboard-header h1 {
   margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: 28px;
+  color: #1a1a1a;
 }
 
-.period-filter {
+.dashboard-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.dashboard-nav .btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-nav .btn-primary {
+  background-color: #0066cc;
+  color: white;
+}
+
+.dashboard-nav .btn-primary:hover {
+  background-color: #0052a3;
+}
+
+.dashboard-nav .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.dashboard-nav .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.period-filter-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   flex-wrap: wrap;
 }
 
-.period-filter label {
+.period-filter-section label {
   font-weight: 600;
-  color: #2c3e50;
+  color: #333;
 }
 
 .period-select {
-  padding: 10px 15px;
-  border: 2px solid #e0e6ed;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   font-size: 14px;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.period-select:hover {
-  border-color: #0088FE;
-}
-
-.period-select:focus {
-  outline: none;
-  border-color: #0088FE;
-  box-shadow: 0 0 0 3px rgba(0, 136, 254, 0.1);
+  min-width: 200px;
 }
 
 .custom-period {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 .date-input {
-  padding: 10px 15px;
-  border: 2px solid #e0e6ed;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   font-size: 14px;
-  background-color: white;
-  transition: all 0.3s ease;
-}
-
-.date-input:focus {
-  outline: none;
-  border-color: #0088FE;
-  box-shadow: 0 0 0 3px rgba(0, 136, 254, 0.1);
 }
 
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .metric-card {
   background: white;
-  border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: all 0.3s ease;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .metric-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .metric-icon {
@@ -109,32 +126,32 @@
 }
 
 .income-icon {
-  background: linear-gradient(135deg, #00C49F 0%, #00E5B8 100%);
+  background: linear-gradient(135deg, #00C49F 0%, #00A878 100%);
   color: white;
 }
 
 .expenses-icon {
-  background: linear-gradient(135deg, #FF8042 0%, #FF9D6B 100%);
+  background: linear-gradient(135deg, #FF8042 0%, #FF6B35 100%);
   color: white;
 }
 
 .profit-icon {
-  background: linear-gradient(135deg, #0088FE 0%, #33A3FF 100%);
+  background: linear-gradient(135deg, #0088FE 0%, #0066CC 100%);
   color: white;
 }
 
 .taxes-icon {
-  background: linear-gradient(135deg, #8884D8 0%, #A29AE8 100%);
+  background: linear-gradient(135deg, #FFBB28 0%, #FFA500 100%);
   color: white;
 }
 
 .cashflow-icon {
-  background: linear-gradient(135deg, #FFBB28 0%, #FFD166 100%);
+  background: linear-gradient(135deg, #8884D8 0%, #6B69D6 100%);
   color: white;
 }
 
 .profitability-icon {
-  background: linear-gradient(135deg, #82ca9d 0%, #9FE2BF 100%);
+  background: linear-gradient(135deg, #82ca9d 0%, #5FA777 100%);
   color: white;
 }
 
@@ -145,32 +162,29 @@
 .metric-content h3 {
   margin: 0 0 8px 0;
   font-size: 14px;
-  font-weight: 600;
-  color: #7f8c8d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #666;
+  font-weight: 500;
 }
 
 .metric-value {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #2c3e50;
+  color: #1a1a1a;
 }
 
 .chart-section {
   background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 40px;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 }
 
 .chart-section h2 {
-  margin: 0 0 25px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #2c3e50;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #1a1a1a;
 }
 
 .categories-section {
@@ -181,23 +195,22 @@
 
 .category-chart {
   background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .category-chart h2 {
-  margin: 0 0 25px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #2c3e50;
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #1a1a1a;
 }
 
 .no-data {
   text-align: center;
-  color: #95a5a6;
+  color: #999;
   padding: 40px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .dashboard-loading,
@@ -205,26 +218,20 @@
   text-align: center;
   padding: 60px 20px;
   font-size: 18px;
-  color: #7f8c8d;
+}
+
+.dashboard-loading {
+  color: #666;
 }
 
 .dashboard-error {
-  color: #e74c3c;
+  color: #dc3545;
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
-  .dashboard-container {
-    padding: 15px;
-  }
-
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .dashboard-header h1 {
-    font-size: 24px;
   }
 
   .metrics-grid {
@@ -235,58 +242,21 @@
     grid-template-columns: 1fr;
   }
 
-  .category-chart {
-    min-width: 0;
-  }
-
-  .metric-card {
-    padding: 20px;
-  }
-
-  .metric-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-  }
-
-  .metric-value {
-    font-size: 20px;
-  }
-
-  .chart-section,
-  .category-chart {
-    padding: 20px;
-  }
-
-  .custom-period {
+  .period-filter-section {
     flex-direction: column;
-    width: 100%;
-  }
-
-  .date-input {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-header h1 {
-    font-size: 20px;
-  }
-
-  .period-filter {
-    width: 100%;
+    align-items: flex-start;
   }
 
   .period-select {
     width: 100%;
   }
 
-  .metric-value {
-    font-size: 18px;
+  .custom-period {
+    width: 100%;
+    flex-direction: column;
   }
 
-  .chart-section h2,
-  .category-chart h2 {
-    font-size: 18px;
+  .date-input {
+    width: 100%;
   }
 }

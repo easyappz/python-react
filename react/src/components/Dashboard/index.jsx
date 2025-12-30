@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getStats, getDynamics, getTopCategories } from '../../api/dashboard';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './styles.css';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [period, setPeriod] = useState('current_month');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -84,39 +86,48 @@ const Dashboard = () => {
     <div className="dashboard-container" data-easytag="id2-react/src/components/Dashboard/index.jsx">
       <div className="dashboard-header">
         <h1>Панель управления</h1>
-        <div className="period-filter">
-          <label htmlFor="period-select">Период:</label>
-          <select 
-            id="period-select"
-            data-testid="dashboard-period-select"
-            value={period} 
-            onChange={handlePeriodChange}
-            className="period-select"
-          >
-            <option value="current_month">Текущий месяц</option>
-            <option value="last_month">Прошлый месяц</option>
-            <option value="current_year">Текущий год</option>
-            <option value="custom">Произвольный период</option>
-          </select>
-          {period === 'custom' && (
-            <div className="custom-period">
-              <input 
-                type="date" 
-                value={dateFrom} 
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="date-input"
-                placeholder="От"
-              />
-              <input 
-                type="date" 
-                value={dateTo} 
-                onChange={(e) => setDateTo(e.target.value)}
-                className="date-input"
-                placeholder="До"
-              />
-            </div>
-          )}
+        <div className="dashboard-nav">
+          <button className="btn btn-primary" onClick={() => navigate('/transactions')}>
+            Транзакции
+          </button>
+          <button className="btn btn-secondary" onClick={() => navigate('/reports')}>
+            Отчеты
+          </button>
         </div>
+      </div>
+
+      <div className="period-filter-section">
+        <label htmlFor="period-select">Период:</label>
+        <select 
+          id="period-select"
+          data-testid="dashboard-period-select"
+          value={period} 
+          onChange={handlePeriodChange}
+          className="period-select"
+        >
+          <option value="current_month">Текущий месяц</option>
+          <option value="last_month">Прошлый месяц</option>
+          <option value="current_year">Текущий год</option>
+          <option value="custom">Произвольный период</option>
+        </select>
+        {period === 'custom' && (
+          <div className="custom-period">
+            <input 
+              type="date" 
+              value={dateFrom} 
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="date-input"
+              placeholder="От"
+            />
+            <input 
+              type="date" 
+              value={dateTo} 
+              onChange={(e) => setDateTo(e.target.value)}
+              className="date-input"
+              placeholder="До"
+            />
+          </div>
+        )}
       </div>
 
       <div className="metrics-grid">

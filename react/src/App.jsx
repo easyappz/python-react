@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Reports from './components/Reports';
 import Profile from './components/Profile';
+import Transactions from './components/Transactions';
 import NotFound from './components/NotFound';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {
       /** Нужно передавать список существующих роутов */
-      window.handleRoutes(['/', '/login', '/register', '/reports', '/profile', '/404']);
+      window.handleRoutes(['/', '/login', '/register', '/reports', '/profile', '/transactions', '/404']);
     }
   }, []);
 
@@ -41,6 +42,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <Transactions />
               </ProtectedRoute>
             }
           />

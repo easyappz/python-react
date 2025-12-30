@@ -1,0 +1,274 @@
+[
+  {
+    "name": "Изменение налоговой ставки в настройках",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='settings-tax-rate']",
+        "value": "15"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='settings-save-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".success-message"
+      }
+    ]
+  },
+  {
+    "name": "Изменение валюты в настройках",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='settings-currency']",
+        "value": "USD"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='settings-save-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".success-message"
+      }
+    ]
+  },
+  {
+    "name": "Изменение периода по умолчанию в настройках",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='settings-default-period']",
+        "value": "quarter"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='settings-save-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".success-message"
+      }
+    ]
+  },
+  {
+    "name": "Добавление новой категории",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='categories-add-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "#name",
+        "value": "Тестовая категория"
+      },
+      {
+        "action": "select",
+        "selector": "#type",
+        "value": "expense"
+      },
+      {
+        "action": "fill",
+        "selector": "#icon",
+        "value": "💼"
+      },
+      {
+        "action": "click",
+        "selector": ".category-form .btn-primary"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".categories-list"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование категории",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='category-edit-btn-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "#name",
+        "value": "Обновленная категория"
+      },
+      {
+        "action": "click",
+        "selector": ".category-form .btn-primary"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".categories-list"
+      }
+    ]
+  },
+  {
+    "name": "Удаление пользовательской категории",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='category-delete-btn-10']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".categories-list"
+      }
+    ]
+  },
+  {
+    "name": "Изменение языка интерфейса на английский",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='settings-language']",
+        "value": "en"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='settings-save-btn']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".success-message"
+      }
+    ]
+  },
+  {
+    "name": "Выход из профиля",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/profile"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='profile-logout-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "url",
+        "expectedUrl": "{domain}/login"
+      }
+    ]
+  }
+]

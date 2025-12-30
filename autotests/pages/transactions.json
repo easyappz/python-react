@@ -1,0 +1,282 @@
+[
+  {
+    "name": "Добавление новой транзакции дохода",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-transaction-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='transaction-form-type']",
+        "value": "income"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-amount']",
+        "value": "50000"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-date']",
+        "value": "2024-01-15"
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='transaction-form-category']",
+        "value": "1"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-description']",
+        "value": "Тестовый доход"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-counterparty']",
+        "value": "Клиент А"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='transaction-form-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Добавление новой транзакции расхода",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='add-transaction-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='transaction-form-type']",
+        "value": "expense"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-amount']",
+        "value": "15000"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-date']",
+        "value": "2024-01-16"
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='transaction-form-category']",
+        "value": "2"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-description']",
+        "value": "Тестовый расход"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='transaction-form-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Редактирование транзакции",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='transaction-edit-btn-1']"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-amount']",
+        "value": "55000"
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transaction-form-description']",
+        "value": "Обновленный доход"
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='transaction-form-submit']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Удаление транзакции",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='transaction-delete-btn-2']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Фильтрация транзакций по типу",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='transactions-filter-type']",
+        "value": "income"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Поиск транзакции по описанию",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "fill",
+        "selector": "[data-testid='transactions-filter-search']",
+        "value": "Обновленный"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-list"
+      }
+    ]
+  },
+  {
+    "name": "Экспорт транзакций",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/transactions"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='export-transactions-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".transactions-page"
+      }
+    ]
+  }
+]

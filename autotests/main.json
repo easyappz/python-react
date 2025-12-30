@@ -11,6 +11,18 @@
     {
       "name": "Тестирование главной страницы Dashboard",
       "filepath": "dashboard.json"
+    },
+    {
+      "name": "Тестирование транзакций",
+      "filepath": "transactions.json"
+    },
+    {
+      "name": "Тестирование отчетов",
+      "filepath": "reports.json"
+    },
+    {
+      "name": "Тестирование профиля",
+      "filepath": "profile.json"
     }
   ]
 }

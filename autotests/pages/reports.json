@@ -1,0 +1,166 @@
+[
+  {
+    "name": "Переключение на отчет о прибылях и убытках",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reports-tab-profit-loss']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
+    "name": "Переключение на отчет о движении денежных средств",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reports-tab-cashflow']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
+    "name": "Переключение на налоговый отчет",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reports-tab-tax']"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
+    "name": "Изменение периода отчета на текущий квартал",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='reports-period-select']",
+        "value": "current_quarter"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
+    "name": "Изменение периода отчета на текущий год",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "select",
+        "selector": "[data-testid='reports-period-select']",
+        "value": "current_year"
+      },
+      {
+        "action": "waitForRequests",
+        "timeout": 3000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
+    "name": "Экспорт отчета в PDF",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 1000
+      },
+      {
+        "action": "click",
+        "selector": "[data-testid='reports-export-btn']"
+      },
+      {
+        "action": "wait",
+        "delay": 2000
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".reports-page"
+      }
+    ]
+  }
+]

@@ -1,5 +1,24 @@
 [
   {
+    "name": "Проверка загрузки данных при переходе на страницу отчетов",
+    "steps": [
+      {
+        "action": "navigate",
+        "url": "{domain}/reports"
+      },
+      {
+        "action": "wait",
+        "delay": 500
+      }
+    ],
+    "assertions": [
+      {
+        "type": "visibility",
+        "selector": ".report-content"
+      }
+    ]
+  },
+  {
     "name": "Переключение на отчет о прибылях и убытках",
     "steps": [
       {

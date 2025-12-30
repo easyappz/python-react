@@ -2,7 +2,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const CashFlowReport = ({ data }) => {
-  if (!data) {
+  if (!data || !data.monthly_data) {
     return <div className="report-empty">Загрузка данных...</div>;
   }
 
@@ -18,7 +18,7 @@ const CashFlowReport = ({ data }) => {
     return date.toLocaleDateString('ru-RU', { month: 'short', year: 'numeric' });
   };
 
-  const chartData = data.monthly_data.map(item => ({
+  const chartData = (data.monthly_data || []).map(item => ({
     month: formatMonth(item.month),
     'Поступления': parseFloat(item.inflows),
     'Платежи': parseFloat(item.outflows),
@@ -74,7 +74,7 @@ const CashFlowReport = ({ data }) => {
             </tr>
           </thead>
           <tbody>
-            {data.monthly_data.map((item, index) => (
+            {(data.monthly_data || []).map((item, index) => (
               <tr key={index}>
                 <td>{formatMonth(item.month)}</td>
                 <td className="text-right">{formatCurrency(item.inflows)}</td>

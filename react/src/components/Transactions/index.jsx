@@ -118,57 +118,59 @@ const Transactions = () => {
   };
 
   return (
-    <div className="transactions-container" data-easytag="id3-react/src/components/Transactions/index.jsx">
-      <div className="transactions-header">
-        <h1>Транзакции</h1>
-        <div className="transactions-actions">
-          <button
-            className="btn btn-export"
-            onClick={() => handleExport('csv')}
-            data-testid="transactions-export-btn"
-          >
-            Экспорт CSV
-          </button>
-          <button
-            className="btn btn-export"
-            onClick={() => handleExport('excel')}
-          >
-            Экспорт Excel
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={handleAddTransaction}
-            data-testid="transactions-add-btn"
-          >
-            + Добавить транзакцию
-          </button>
+    <div className="transactions-page" data-easytag="id3-react/src/components/Transactions/index.jsx">
+      <div className="transactions-container">
+        <div className="transactions-header">
+          <h1>Транзакции</h1>
+          <div className="transactions-actions">
+            <button
+              className="btn btn-export"
+              onClick={() => handleExport('csv')}
+              data-testid="export-transactions-btn"
+            >
+              Экспорт CSV
+            </button>
+            <button
+              className="btn btn-export"
+              onClick={() => handleExport('excel')}
+            >
+              Экспорт Excel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleAddTransaction}
+              data-testid="add-transaction-btn"
+            >
+              + Добавить транзакцию
+            </button>
+          </div>
         </div>
-      </div>
 
-      <TransactionFilters
-        filters={filters}
-        categories={categories}
-        onChange={handleFiltersChange}
-      />
-
-      {error && <div className="transactions-error">{error}</div>}
-
-      <TransactionsList
-        transactions={transactions}
-        categories={categories}
-        loading={loading}
-        onEdit={handleEditTransaction}
-        onDelete={handleDeleteTransaction}
-      />
-
-      {isFormOpen && (
-        <TransactionForm
-          transaction={editingTransaction}
+        <TransactionFilters
+          filters={filters}
           categories={categories}
-          onClose={handleFormClose}
-          onSuccess={handleFormSuccess}
+          onChange={handleFiltersChange}
         />
-      )}
+
+        {error && <div className="transactions-error">{error}</div>}
+
+        <TransactionsList
+          transactions={transactions}
+          categories={categories}
+          loading={loading}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteTransaction}
+        />
+
+        {isFormOpen && (
+          <TransactionForm
+            transaction={editingTransaction}
+            categories={categories}
+            onClose={handleFormClose}
+            onSuccess={handleFormSuccess}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import ErrorBoundary from './ErrorBoundary';
 import './App.css';
 
 import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -32,7 +33,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -41,7 +44,9 @@ function App() {
             path="/reports"
             element={
               <ProtectedRoute>
-                <Reports />
+                <Layout>
+                  <Reports />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -50,7 +55,9 @@ function App() {
             path="/transactions"
             element={
               <ProtectedRoute>
-                <Transactions />
+                <Layout>
+                  <Transactions />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -59,7 +66,9 @@ function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <Profile />
+                <Layout>
+                  <Profile />
+                </Layout>
               </ProtectedRoute>
             }
           />

@@ -1,7 +1,7 @@
 .notfound-container {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
@@ -9,41 +9,87 @@
 
 .notfound-content {
   text-align: center;
-  color: white;
+  background-color: white;
+  padding: 60px 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
 }
 
 .notfound-title {
   font-size: 120px;
   font-weight: 700;
   margin: 0;
+  color: #1a56db;
   line-height: 1;
 }
 
 .notfound-subtitle {
   font-size: 32px;
   font-weight: 600;
-  margin: 16px 0;
+  margin: 20px 0 16px;
+  color: #111827;
 }
 
-.notfound-description {
-  font-size: 18px;
-  margin: 16px 0 32px 0;
-  opacity: 0.9;
+.notfound-text {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 32px;
+  line-height: 1.6;
 }
 
-.notfound-button {
-  background: white;
-  color: #667eea;
-  border: none;
+.notfound-btn {
   padding: 14px 32px;
+  background-color: #1a56db;
+  color: white;
+  border: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
 }
 
-.notfound-button:hover {
+.notfound-btn:hover {
+  background-color: #1e429f;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(26, 86, 219, 0.4);
+}
+
+.notfound-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .notfound-content {
+    padding: 40px 30px;
+  }
+
+  .notfound-title {
+    font-size: 80px;
+  }
+
+  .notfound-subtitle {
+    font-size: 24px;
+  }
+
+  .notfound-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notfound-content {
+    padding: 30px 20px;
+  }
+
+  .notfound-title {
+    font-size: 60px;
+  }
+
+  .notfound-subtitle {
+    font-size: 20px;
+  }
 }

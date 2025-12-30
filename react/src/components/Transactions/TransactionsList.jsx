@@ -1,6 +1,10 @@
 import React from 'react';
 
 const TransactionsList = ({ transactions, categories, loading, onEdit, onDelete }) => {
+  // Ensure transactions is always an array
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const safeCategories = Array.isArray(categories) ? categories : [];
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
@@ -16,7 +20,7 @@ const TransactionsList = ({ transactions, categories, loading, onEdit, onDelete 
   };
 
   const getCategoryName = (categoryId) => {
-    const category = categories.find(c => c.id === categoryId);
+    const category = safeCategories.find(c => c.id === categoryId);
     return category ? category.name : 'Без категории';
   };
 
@@ -24,7 +28,7 @@ const TransactionsList = ({ transactions, categories, loading, onEdit, onDelete 
     return <div className="transactions-loading">Загрузка...</div>;
   }
 
-  if (transactions.length === 0) {
+  if (safeTransactions.length === 0) {
     return <div className="transactions-empty">Нет транзакций</div>;
   }
 
@@ -47,7 +51,7 @@ const TransactionsList = ({ transactions, categories, loading, onEdit, onDelete 
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction) => (
+            {safeTransactions.map((transaction) => (
               <tr
                 key={transaction.id}
                 className="transaction-row"
@@ -103,7 +107,7 @@ const TransactionsList = ({ transactions, categories, loading, onEdit, onDelete 
       </div>
 
       <div className="transactions-cards">
-        {transactions.map((transaction) => (
+        {safeTransactions.map((transaction) => (
           <div
             key={transaction.id}
             className="transaction-card"

@@ -12,6 +12,8 @@ ENV DJANGO_SUPERUSER_USERNAME=admin
 ENV DJANGO_SUPERUSER_PASSWORD=admin
 ENV DJANGO_SUPERUSER_EMAIL=admin@mail.ru
 
+ENV APP_ID=testid
+
 # Set working directory
 WORKDIR /app
 

@@ -1,6 +1,6 @@
 .register-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
 }
 
 .register-container {
@@ -21,7 +21,7 @@
 }
 
 .register-title {
-  color: #172b4d;
+  color: #c62828;
   font-size: 28px;
   font-weight: 600;
   margin: 0 0 32px 0;
@@ -32,6 +32,96 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  color: #172b4d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-input {
+  background-color: #fafbfc;
+  border: 2px solid #dfe1e6;
+  border-radius: 4px;
+  color: #172b4d;
+  font-size: 14px;
+  padding: 12px 14px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  background-color: #ffffff;
+  border-color: #d32f2f;
+}
+
+.form-input.error {
+  border-color: #eb5a46;
+  background-color: #fff5f5;
+}
+
+.error-message {
+  color: #eb5a46;
+  font-size: 13px;
+  margin-top: -4px;
+}
+
+.error-message.general {
+  background-color: #fff5f5;
+  border: 1px solid #eb5a46;
+  border-radius: 4px;
+  padding: 12px;
+  text-align: center;
+}
+
+.submit-button {
+  background-color: #d32f2f;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #b71c1c;
+}
+
+.submit-button:disabled {
+  background-color: #ef9a9a;
+  cursor: not-allowed;
+}
+
+.register-footer {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.footer-text {
+  color: #5e6c84;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-link {
+  color: #d32f2f;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {

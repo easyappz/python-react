@@ -2,15 +2,14 @@
 # Stage 1: Build React Frontend
 # ================================
 FROM node:20-alpine AS react-builder
-# ☝️ ИЗМЕНИЛИ 18 → 20
 
 WORKDIR /app/react
 
-# Копируем package.json
-COPY react/package*.json ./
+# Копируем lock-файлы для кеширования
+COPY react/package.json react/package-lock.json ./
 
-# Устанавливаем зависимости
-RUN npm install --legacy-peer-deps
+# Используем npm ci для воспроизводимой сборки
+RUN npm ci --legacy-peer-deps
 
 # Копируем исходники
 COPY react/ ./

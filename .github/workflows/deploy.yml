@@ -1,0 +1,241 @@
+name: Deploy to K3s with GHCR
+
+on:
+  push:
+    branches:
+      - 'app-*'  # app-1, app-2, ..., app-100
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}  # автоматически: owner/repo
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write  # Это ключевое разрешение для GHCR!
+    
+    steps:
+      # ========================================
+      # ШАГ 1: Получить код
+      # ========================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ========================================
+      # ШАГ 2: Определить APP_ID
+      # ========================================
+      - name: Extract App ID
+        id: vars
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          APP_ID="${BRANCH_NAME#app-}"
+          
+          # Нормализуем имя образа (lowercase, без специальных символов)
+          IMAGE_BASE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          
+          echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+          echo "image_full=${IMAGE_BASE}-${APP_ID}:latest" >> $GITHUB_OUTPUT
+          echo "image_sha=${IMAGE_BASE}-${APP_ID}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          
+          echo "✅ App ID: $APP_ID"
+          echo "✅ Image: ${IMAGE_BASE}-${APP_ID}:latest"
+
+      # ========================================
+      # ШАГ 3: Настроить Docker Buildx
+      # ========================================
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ========================================
+      # ШАГ 4: Логин в GHCR (автоматически!)
+      # ========================================
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}  # Автоматически - тот, кто запустил workflow
+          password: ${{ secrets.GITHUB_TOKEN }}  # Автоматический токен
+
+      # ========================================
+      # ШАГ 5: Собрать и отправить образ
+      # ========================================
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            APP_ID=${{ steps.vars.outputs.app_id }}
+          tags: |
+            ${{ steps.vars.outputs.image_full }}
+            ${{ steps.vars.outputs.image_sha }}
+          cache-from: type=registry,ref=${{ steps.vars.outputs.image_full }}
+          cache-to: type=inline
+
+      # ========================================
+      # ШАГ 6: Настроить kubectl
+      # ========================================
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          
+          echo "✅ Kubectl configured"
+          kubectl version --client
+
+      # ========================================
+      # ШАГ 7: Создать namespace
+      # ========================================
+      - name: Create namespace
+        run: |
+          kubectl create namespace apps --dry-run=client -o yaml | kubectl apply -f -
+
+      # ========================================
+      # ШАГ 8: Создать Secret для GHCR
+      # ========================================
+      - name: Create image pull secret
+        run: |
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=${{ env.REGISTRY }} \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }} \
+            --namespace=apps \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # ========================================
+      # ШАГ 9: Деплой в K3s
+      # ========================================
+      - name: Deploy to K3s
+        run: |
+          APP_ID=${{ steps.vars.outputs.app_id }}
+          IMAGE=${{ steps.vars.outputs.image_full }}
+          
+          cat <<EOF | kubectl apply -f -
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: app-${APP_ID}
+            namespace: apps
+            labels:
+              app: app-${APP_ID}
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: app-${APP_ID}
+            template:
+              metadata:
+                labels:
+                  app: app-${APP_ID}
+              spec:
+                imagePullSecrets:
+                - name: ghcr-secret
+                containers:
+                - name: app
+                  image: ${IMAGE}
+                  imagePullPolicy: Always
+                  ports:
+                  - containerPort: 8080
+                    name: http
+                  env:
+                  - name: APP_ID
+                    value: "${APP_ID}"
+                  - name: DJANGO_SUPERUSER_USERNAME
+                    value: "admin"
+                  - name: DJANGO_SUPERUSER_PASSWORD
+                    value: "admin"
+                  - name: DJANGO_SUPERUSER_EMAIL
+                    value: "admin@mail.ru"
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "100m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+                  livenessProbe:
+                    httpGet:
+                      path: /
+                      port: 8080
+                    initialDelaySeconds: 60
+                    periodSeconds: 10
+                  readinessProbe:
+                    httpGet:
+                      path: /
+                      port: 8080
+                    initialDelaySeconds: 30
+                    periodSeconds: 5
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: app-${APP_ID}-service
+            namespace: apps
+          spec:
+            type: ClusterIP
+            ports:
+            - port: 8080
+              targetPort: 8080
+              protocol: TCP
+            selector:
+              app: app-${APP_ID}
+          ---
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: app-${APP_ID}-ingress
+            namespace: apps
+            annotations:
+              kubernetes.io/ingress.class: traefik
+          spec:
+            rules:
+            - host: app-${APP_ID}.dev.easyappz.ru
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: app-${APP_ID}-service
+                      port:
+                        number: 8080
+          EOF
+
+      # ========================================
+      # ШАГ 10: Дождаться готовности
+      # ========================================
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/app-${{ steps.vars.outputs.app_id }} \
+            -n apps --timeout=5m
+
+      # ========================================
+      # ШАГ 11: Проверка
+      # ========================================
+      - name: Verify deployment
+        run: |
+          APP_ID=${{ steps.vars.outputs.app_id }}
+          
+          echo "================================"
+          echo "📦 PODS:"
+          kubectl get pods -n apps -l app=app-${APP_ID}
+          
+          echo ""
+          echo "🌐 SERVICE:"
+          kubectl get svc -n apps app-${APP_ID}-service
+          
+          echo ""
+          echo "🔗 INGRESS:"
+          kubectl get ingress -n apps app-${APP_ID}-ingress
+          
+          echo ""
+          echo "✅ Deployed: http://app-${APP_ID}.dev.easyappz.ru"

@@ -1,6 +1,6 @@
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #1e3a5f 0%, #2c5aa0 100%);
 }
 
 .login-container {
@@ -21,7 +21,7 @@
 }
 
 .login-title {
-  color: #172b4d;
+  color: #1e3a5f;
   font-size: 28px;
   font-weight: 600;
   margin: 0 0 32px 0;
@@ -41,14 +41,14 @@
 }
 
 .form-label {
-  color: #172b4d;
+  color: #1e3a5f;
   font-size: 14px;
   font-weight: 500;
 }
 
 .form-input {
   background-color: #fafbfc;
-  border: 2px solid #dfe1e6;
+  border: 2px solid #3b82f6;
   border-radius: 4px;
   color: #172b4d;
   font-size: 14px;
@@ -59,7 +59,7 @@
 
 .form-input:focus {
   background-color: #ffffff;
-  border-color: #0079bf;
+  border-color: #1d4ed8;
 }
 
 .form-input.error {
@@ -82,7 +82,7 @@
 }
 
 .submit-button {
-  background-color: #0079bf;
+  background-color: #2563eb;
   border: none;
   border-radius: 4px;
   color: #ffffff;
@@ -95,7 +95,7 @@
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #026aa7;
+  background-color: #1d4ed8;
 }
 
 .submit-button:disabled {
@@ -115,7 +115,7 @@
 }
 
 .footer-link {
-  color: #0079bf;
+  color: #2563eb;
   text-decoration: none;
   font-weight: 500;
 }

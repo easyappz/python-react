@@ -72,3 +72,17 @@ htmlcov/
 .github/
 .gitlab-ci.yml
 Jenkinsfile
+
+.git
+.github
+node_modules
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.log
+.env
+.venv
+*.sqlite3
+.DS_Store

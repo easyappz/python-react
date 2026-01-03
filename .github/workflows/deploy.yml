@@ -1,0 +1,212 @@
+name: Deploy to Production K3s
+
+on:
+  push:
+    branches:
+      - 'app-*'  # app-1, app-2, ..., app-100
+
+env:
+  REGISTRY: ${{ secrets.REGISTRY_URL }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ========================================
+      # ШАГ 1: Получить код
+      # ========================================
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ========================================
+      # ШАГ 2: Определить APP_ID из имени ветки
+      # ========================================
+      - name: Extract App ID
+        id: app_id
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          APP_ID="${BRANCH_NAME#app-}"
+          
+          echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+          echo "image_name=${{ env.REGISTRY }}/myapp-${APP_ID}" >> $GITHUB_OUTPUT
+          echo "image_tag=latest" >> $GITHUB_OUTPUT
+          
+          echo "✅ Deploying App ID: $APP_ID"
+
+      # ========================================
+      # ШАГ 3: Логин в Docker Registry
+      # ========================================
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # ========================================
+      # ШАГ 4: Собрать и отправить Docker образ
+      # ========================================
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            APP_ID=${{ steps.app_id.outputs.app_id }}
+          tags: |
+            ${{ steps.app_id.outputs.image_name }}:${{ steps.app_id.outputs.image_tag }}
+            ${{ steps.app_id.outputs.image_name }}:${{ github.sha }}
+
+      # ========================================
+      # ШАГ 5: Настроить kubectl
+      # ========================================
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          
+          # Проверка подключения
+          kubectl cluster-info
+          kubectl get nodes
+
+      # ========================================
+      # ШАГ 6: Создать namespace (если нужно)
+      # ========================================
+      - name: Create Namespace
+        run: |
+          kubectl create namespace apps --dry-run=client -o yaml | kubectl apply -f -
+
+      # ========================================
+      # ШАГ 7: Применить Kubernetes манифесты
+      # ========================================
+      - name: Deploy to K3s
+        run: |
+          APP_ID=${{ steps.app_id.outputs.app_id }}
+          IMAGE=${{ steps.app_id.outputs.image_name }}:${{ steps.app_id.outputs.image_tag }}
+          
+          cat <<EOF | kubectl apply -f -
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: app-${APP_ID}
+            namespace: apps
+            labels:
+              app: app-${APP_ID}
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: app-${APP_ID}
+            template:
+              metadata:
+                labels:
+                  app: app-${APP_ID}
+              spec:
+                containers:
+                - name: app
+                  image: ${IMAGE}
+                  imagePullPolicy: Always
+                  ports:
+                  - containerPort: 8080
+                    name: http
+                  env:
+                  - name: APP_ID
+                    value: "${APP_ID}"
+                  - name: DJANGO_SUPERUSER_USERNAME
+                    value: "admin"
+                  - name: DJANGO_SUPERUSER_PASSWORD
+                    value: "admin"
+                  - name: DJANGO_SUPERUSER_EMAIL
+                    value: "admin@mail.ru"
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "100m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+                  livenessProbe:
+                    httpGet:
+                      path: /
+                      port: 8080
+                    initialDelaySeconds: 30
+                    periodSeconds: 10
+                  readinessProbe:
+                    httpGet:
+                      path: /
+                      port: 8080
+                    initialDelaySeconds: 10
+                    periodSeconds: 5
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: app-${APP_ID}-service
+            namespace: apps
+          spec:
+            type: ClusterIP
+            ports:
+            - port: 8080
+              targetPort: 8080
+              protocol: TCP
+              name: http
+            selector:
+              app: app-${APP_ID}
+          ---
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: app-${APP_ID}-ingress
+            namespace: apps
+            annotations:
+              kubernetes.io/ingress.class: traefik
+          spec:
+            rules:
+            - host: app-${APP_ID}.yourdomain.com
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: app-${APP_ID}-service
+                      port:
+                        number: 8080
+          EOF
+
+      # ========================================
+      # ШАГ 8: Дождаться готовности
+      # ========================================
+      - name: Wait for Deployment
+        run: |
+          kubectl rollout status deployment/app-${{ steps.app_id.outputs.app_id }} \
+            -n apps --timeout=5m
+
+      # ========================================
+      # ШАГ 9: Проверить статус
+      # ========================================
+      - name: Verify Deployment
+        run: |
+          APP_ID=${{ steps.app_id.outputs.app_id }}
+          
+          echo "📦 Pods:"
+          kubectl get pods -n apps -l app=app-${APP_ID}
+          
+          echo ""
+          echo "🌐 Services:"
+          kubectl get svc -n apps app-${APP_ID}-service
+          
+          echo ""
+          echo "🔗 Ingress:"
+          kubectl get ingress -n apps app-${APP_ID}-ingress
+          
+          echo ""
+          echo "✅ App URL: http://app-${APP_ID}.yourdomain.com"

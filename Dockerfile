@@ -1,21 +1,11 @@
 FROM ubuntu:24.04
 
-# Application ID (passed during build)
-ARG APP_ID
-RUN echo "Building with APP_ID: ${APP_ID}"
-ENV APP_ID=${APP_ID}
-
 # Prevent interactive prompts during build
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set Python to not buffer stdout/stderr
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# Superuser environment variables
-ENV DJANGO_SUPERUSER_USERNAME=admin
-ENV DJANGO_SUPERUSER_PASSWORD=admin
-ENV DJANGO_SUPERUSER_EMAIL=admin@mail.ru
 
 # Set working directory
 WORKDIR /app

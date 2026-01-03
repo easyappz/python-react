@@ -198,7 +198,7 @@ jobs:
               kubernetes.io/ingress.class: traefik
           spec:
             rules:
-            - host: app-${APP_ID}.yourdomain.com
+            - host: app-${APP_ID}.dev.easyappz.ru
               http:
                 paths:
                 - path: /
@@ -238,4 +238,4 @@ jobs:
           kubectl get ingress -n apps app-${APP_ID}-ingress
           
           echo ""
-          echo "✅ Deployed: http://app-${APP_ID}.yourdomain.com"
+          echo "✅ Deployed: http://app-${APP_ID}.dev.easyappz.ru"

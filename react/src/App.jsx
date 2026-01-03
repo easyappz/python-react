@@ -5,7 +5,7 @@ import './App.css';
 
 import { Home } from './components/Home';
 
-fun123ction App() {
+function App() {
   /** Никогда не удаляй этот код */
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {

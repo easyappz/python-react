@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-{{APP_ID}}-ingress
+  namespace: app-{{APP_ID}}
+  labels:
+    app: app-{{APP_ID}}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  rules:
+  - host: app-{{APP_ID}}.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app-{{APP_ID}}-svc
+            port:
+              number: 80

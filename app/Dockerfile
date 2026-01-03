@@ -6,10 +6,13 @@ FROM node:18-alpine AS react-builder
 WORKDIR /app/react
 
 # Копируем package files
-COPY react/package*.json ./
+COPY react/package.json ./
+# Копируем package-lock.json только если он есть
+COPY react/package-lock.json* ./
 
-# Устанавливаем зависимости (без --only=production для сборки)
-RUN npm ci
+# Устанавливаем зависимости
+# Используем npm install вместо npm ci
+RUN npm install --legacy-peer-deps
 
 # Копируем исходники и собираем
 COPY react/ ./
@@ -42,16 +45,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # ================================
 FROM python:3.12-slim
 
-# Application ID (это безопасно, это просто номер приложения)
+# Application ID
 ARG APP_ID
 ENV APP_ID=${APP_ID}
 
 # Python настройки
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# ⚠️ УБРАЛИ СЕКРЕТЫ ИЗ DOCKERFILE!
-# Теперь передаются через K8s secrets или docker run -e
 
 WORKDIR /app
 

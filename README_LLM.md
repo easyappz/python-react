@@ -594,3 +594,4 @@ This boilerplate is designed for:
 3. Maintaining clean, documented code
 
 Always regenerate `openapi.yml` after modifications so the frontend generation process has the latest API definition.
+

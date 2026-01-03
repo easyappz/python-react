@@ -7,14 +7,14 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/myapp  # автоматически возьмет ваш username
+  IMAGE_NAME: ${{ github.repository }}  # автоматически: owner/repo
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # Разрешение для записи в GHCR
+      packages: write  # Это ключевое разрешение для GHCR!
     
     steps:
       # ========================================
@@ -32,12 +32,15 @@ jobs:
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
           APP_ID="${BRANCH_NAME#app-}"
           
+          # Нормализуем имя образа (lowercase, без специальных символов)
+          IMAGE_BASE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          
           echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
-          echo "image_full=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${APP_ID}:latest" >> $GITHUB_OUTPUT
-          echo "image_sha=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${APP_ID}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "image_full=${IMAGE_BASE}-${APP_ID}:latest" >> $GITHUB_OUTPUT
+          echo "image_sha=${IMAGE_BASE}-${APP_ID}:${{ github.sha }}" >> $GITHUB_OUTPUT
           
           echo "✅ App ID: $APP_ID"
-          echo "✅ Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${APP_ID}:latest"
+          echo "✅ Image: ${IMAGE_BASE}-${APP_ID}:latest"
 
       # ========================================
       # ШАГ 3: Настроить Docker Buildx
@@ -46,17 +49,17 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       # ========================================
-      # ШАГ 4: Логин в GitHub Container Registry
+      # ШАГ 4: Логин в GHCR (автоматически!)
       # ========================================
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ github.actor }}  # Автоматически - тот, кто запустил workflow
+          password: ${{ secrets.GITHUB_TOKEN }}  # Автоматический токен
 
       # ========================================
-      # ШАГ 5: Собрать и отправить образ в GHCR
+      # ШАГ 5: Собрать и отправить образ
       # ========================================
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -85,9 +88,8 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
           
-          # Проверка подключения
+          echo "✅ Kubectl configured"
           kubectl version --client
-          kubectl cluster-info
 
       # ========================================
       # ШАГ 7: Создать namespace
@@ -97,19 +99,19 @@ jobs:
           kubectl create namespace apps --dry-run=client -o yaml | kubectl apply -f -
 
       # ========================================
-      # ШАГ 8: Создать Secret для доступа к GHCR
+      # ШАГ 8: Создать Secret для GHCR
       # ========================================
       - name: Create image pull secret
         run: |
           kubectl create secret docker-registry ghcr-secret \
             --docker-server=${{ env.REGISTRY }} \
-            --docker-username=${{ secrets.GHCR_USERNAME }} \
-            --docker-password=${{ secrets.GHCR_TOKEN }} \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }} \
             --namespace=apps \
             --dry-run=client -o yaml | kubectl apply -f -
 
       # ========================================
-      # ШАГ 9: Применить Kubernetes манифесты
+      # ШАГ 9: Деплой в K3s
       # ========================================
       - name: Deploy to K3s
         run: |
@@ -125,7 +127,6 @@ jobs:
             namespace: apps
             labels:
               app: app-${APP_ID}
-              version: "${{ github.sha }}"
           spec:
             replicas: 1
             selector:
@@ -167,29 +168,24 @@ jobs:
                       port: 8080
                     initialDelaySeconds: 60
                     periodSeconds: 10
-                    timeoutSeconds: 5
                   readinessProbe:
                     httpGet:
                       path: /
                       port: 8080
                     initialDelaySeconds: 30
                     periodSeconds: 5
-                    timeoutSeconds: 3
           ---
           apiVersion: v1
           kind: Service
           metadata:
             name: app-${APP_ID}-service
             namespace: apps
-            labels:
-              app: app-${APP_ID}
           spec:
             type: ClusterIP
             ports:
             - port: 8080
               targetPort: 8080
               protocol: TCP
-              name: http
             selector:
               app: app-${APP_ID}
           ---
@@ -200,7 +196,6 @@ jobs:
             namespace: apps
             annotations:
               kubernetes.io/ingress.class: traefik
-              traefik.ingress.kubernetes.io/router.entrypoints: web
           spec:
             rules:
             - host: app-${APP_ID}.yourdomain.com
@@ -224,33 +219,23 @@ jobs:
             -n apps --timeout=5m
 
       # ========================================
-      # ШАГ 11: Проверить статус
+      # ШАГ 11: Проверка
       # ========================================
       - name: Verify deployment
         run: |
           APP_ID=${{ steps.vars.outputs.app_id }}
           
           echo "================================"
-          echo "📦 PODS STATUS:"
-          echo "================================"
-          kubectl get pods -n apps -l app=app-${APP_ID} -o wide
+          echo "📦 PODS:"
+          kubectl get pods -n apps -l app=app-${APP_ID}
           
           echo ""
-          echo "================================"
           echo "🌐 SERVICE:"
-          echo "================================"
           kubectl get svc -n apps app-${APP_ID}-service
           
           echo ""
-          echo "================================"
           echo "🔗 INGRESS:"
-          echo "================================"
           kubectl get ingress -n apps app-${APP_ID}-ingress
           
           echo ""
-          echo "================================"
-          echo "✅ DEPLOYMENT COMPLETE!"
-          echo "================================"
-          echo "App URL: http://app-${APP_ID}.yourdomain.com"
-          echo "Image: ${{ steps.vars.outputs.image_full }}"
-          echo "Commit: ${{ github.sha }}"
+          echo "✅ Deployed: http://app-${APP_ID}.yourdomain.com"

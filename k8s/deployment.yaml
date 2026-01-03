@@ -38,19 +38,41 @@ spec:
           protocol: TCP
         
         env:
+        # Application ID (не секрет)
         - name: APP_ID
           value: "{{APP_ID}}"
+        
+        # Python settings
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: PYTHONDONTWRITEBYTECODE
+          value: "1"
+        
+        # Django admin credentials (из секретов!)
         - name: DJANGO_SUPERUSER_USERNAME
-          value: "admin"
+          valueFrom:
+            secretKeyRef:
+              name: app-{{APP_ID}}-secret
+              key: django-superuser-username
+        
         - name: DJANGO_SUPERUSER_PASSWORD
           valueFrom:
             secretKeyRef:
               name: app-{{APP_ID}}-secret
-              key: admin-password
+              key: django-superuser-password
+        
         - name: DJANGO_SUPERUSER_EMAIL
-          value: "admin@mail.ru"
-        - name: PYTHONUNBUFFERED
-          value: "1"
+          valueFrom:
+            secretKeyRef:
+              name: app-{{APP_ID}}-secret
+              key: django-superuser-email
+        
+        # Опционально: Django secret key
+        # - name: DJANGO_SECRET_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: app-{{APP_ID}}-secret
+        #       key: django-secret-key
         
         resources:
           requests:
